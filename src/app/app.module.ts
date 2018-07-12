@@ -9,6 +9,10 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 
+// NG material
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatCardModule, MatButtonModule, MatProgressSpinnerModule } from '@angular/material';
+
 // NG Translate
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -19,10 +23,6 @@ import { WebviewDirective } from './directives/webview.directive';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
-
-// NG material
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatCardModule, MatButtonModule } from '@angular/material';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -37,9 +37,10 @@ export function HttpLoaderFactory(http: HttpClient) {
     ],
     imports: [
         BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
         FormsModule,
         HttpClientModule,
-        AppRoutingModule,
         TranslateModule.forRoot({
             loader: {
                 provide: TranslateLoader,
@@ -47,8 +48,7 @@ export function HttpLoaderFactory(http: HttpClient) {
                 deps: [HttpClient]
             }
         }),
-        BrowserAnimationsModule,
-        MatCardModule, MatButtonModule
+        MatCardModule, MatButtonModule, MatProgressSpinnerModule
     ],
     providers: [ElectronService],
     bootstrap: [AppComponent]

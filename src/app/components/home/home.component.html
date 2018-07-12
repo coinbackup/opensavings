@@ -1,11 +1,33 @@
 <div class="container">
+
     <h1 class="title">
+
         <mat-card>
             <mat-card-title>Huzzah</mat-card-title>
-            <mat-card-content>{{ 'PAGES.HOME.TITLE' | translate }}</mat-card-content>
+            <mat-card-content>
+                <p>{{ 'PAGES.HOME.TITLE' | translate }}</p>
+                <p>
+                    <button mat-raised-button color="primary" (click)="createSendAddress()">Create address to send coins to</button>
+                </p>
+
+                <div *ngIf="addressQrData">
+                    <div *ngIf="!foundTx">
+                        <img src="{{addressQrData}}" width="200" height="200" alt="QR code">
+                        <br>
+
+                        <p>
+                            <mat-progress-spinner mode="indeterminate" diameter="25"></mat-progress-spinner>
+                            Waiting for a transaction to be sent to this address...
+                        </p>
+                        <button mat-raised-button color="accent" (click)="sendCoins()">Send some coins to it</button>
+                    </div>
+                    <p *ngIf="foundTx">
+                        Found transaction!
+                    </p>
+                </div>
+            </mat-card-content>
             <mat-card-actions>
-                <button mat-button>LIKE</button>
-                <button mat-button>SHARE</button>
+                
             </mat-card-actions>
         </mat-card>
 
