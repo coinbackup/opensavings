@@ -6,9 +6,10 @@
             <mat-card-title>Huzzah</mat-card-title>
             <mat-card-content>
                 <p>{{ 'PAGES.HOME.TITLE' | translate }}</p>
-                <p>
+                <!-- <p>
                     <button mat-raised-button color="primary" (click)="createSendAddress()">Create address to send coins to</button>
-                </p>
+                </p> -->
+
 
                 <div *ngIf="addressQrData">
                     <div *ngIf="!foundTx">
@@ -27,7 +28,9 @@
                 </div>
             </mat-card-content>
             <mat-card-actions>
-                
+                <button mat-raised-button color="primary" (click)="showInfo()">Show info</button>
+                <button mat-raised-button color="primary" (click)="showBalance()">Show P2SH balance and UTXOs</button>
+                <button mat-raised-button color="primary" (click)="redeem()">Redeem P2SH coins</button>
             </mat-card-actions>
         </mat-card>
 
