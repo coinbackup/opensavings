@@ -6,26 +6,7 @@
             <mat-card-title>Huzzah</mat-card-title>
             <mat-card-content>
                 <p>{{ 'PAGES.HOME.TITLE' | translate }}</p>
-                <!-- <p>
-                    <button mat-raised-button color="primary" (click)="createSendAddress()">Create address to send coins to</button>
-                </p> -->
-
-
-                <div *ngIf="addressQrData">
-                    <div *ngIf="!foundTx">
-                        <img src="{{addressQrData}}" width="200" height="200" alt="QR code">
-                        <br>
-
-                        <p>
-                            <mat-progress-spinner mode="indeterminate" diameter="25"></mat-progress-spinner>
-                            Waiting for a transaction to be sent to this address...
-                        </p>
-                        <button mat-raised-button color="accent" (click)="sendCoins()">Send some coins to it</button>
-                    </div>
-                    <p *ngIf="foundTx">
-                        Found transaction!
-                    </p>
-                </div>
+                <!-- <img src="{{addressQrData}}" width="200" height="200" alt="QR code"> -->
             </mat-card-content>
             <mat-card-actions>
                 <button mat-raised-button color="primary" (click)="showInfo()">Show info</button>

@@ -78,7 +78,7 @@ export class TimeLockPubKeyHash implements TimeLockScriptInterface {
         
         return Bitcore.Script()
         .add( signature.toTxFormat() )
-        .add( privateKey.toPublicKey.toBuffer() )
+        .add( privateKey.toPublicKey().toBuffer() )
         .add( redeemScript.toBuffer() );
     }
 }
