@@ -133,17 +133,15 @@ export class HomeComponent implements OnInit {
                 let tx = new Bitcore.Transaction()
                 .from( utxos )
                 .to( toAddress, totalSatoshis - fee )
-                // Must include nLockTime in order to spend CLTV-locked coins
-                // Add one second to the CLTV lockTime to ensure it passes the test
+                // Must include nLockTime in order to spend CLTV-locked coins. Add one second to the lockTime for good measure
                 .lockUntilDate( new Date((lockTimeSeconds+1) * 1000) );
                 
-                tx.inputs.forEach( (input, i) => {
-                    // Set sequenceNumber on inputs now, since it can't be done during the .from() function.
-                    // If sequenceNumber is the default value, nLockTime will be ignored and the CLTV opcode will cause the tx to fail
-                    input.sequenceNumber = 0;
-                    // Sign the input and replace the scriptSig on the input with a new one that will be able to spend the coins.
-                    input.setScript( this.scriptType.buildScriptSig(tx, i, redeemerPrivateKey, redeemScript) );
-                });
+                // If sequenceNumber is the default value, nLockTime will be ignored and the CLTV opcode will cause the tx to fail
+                tx.inputs.forEach( input => input.sequenceNumber = 0 );
+
+                // Now that the transaction is completely built except for signatures, sign the inputs and replace the
+                // scriptSig on the inputs with new ones that will be able to spend the coins.
+                tx.inputs.forEach( (input, i) => input.setScript(this.scriptType.buildScriptSig( tx, i, redeemerPrivateKey, redeemScript )) );
 
                 resolve( tx );
             });
