@@ -11,7 +11,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 // NG material
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatCardModule, MatButtonModule, MatProgressSpinnerModule } from '@angular/material';
+import { MatCardModule, MatButtonModule, MatProgressSpinnerModule, MatInputModule } from '@angular/material';
 
 // NG Translate
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -48,7 +48,7 @@ export function HttpLoaderFactory(http: HttpClient) {
                 deps: [HttpClient]
             }
         }),
-        MatCardModule, MatButtonModule, MatProgressSpinnerModule
+        MatCardModule, MatButtonModule, MatProgressSpinnerModule, MatInputModule
     ],
     providers: [ElectronService],
     bootstrap: [AppComponent]

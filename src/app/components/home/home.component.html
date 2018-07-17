@@ -1,19 +1,41 @@
 <div class="container">
 
-    <h1 class="title">
+    <p>{{ 'PAGES.HOME.TITLE' | translate }}</p>
+    
+    <mat-card>
+        <h3>Create time-locked address</h3>
+        <mat-form-field>
+            <input type="number" matInput placeholder="Lock time (unix timestamp)" [(ngModel)]="lockTimeInput">
+        </mat-form-field>
+        <br>
+        <button mat-raised-button color="primary" (click)="createTimeLockedAddress( lockTimeInput )">Create address</button>
+    </mat-card>
 
-        <mat-card>
-            <mat-card-title>Huzzah</mat-card-title>
-            <mat-card-content>
-                <p>{{ 'PAGES.HOME.TITLE' | translate }}</p>
-                <!-- <img src="{{addressQrData}}" width="200" height="200" alt="QR code"> -->
-            </mat-card-content>
-            <mat-card-actions>
-                <button mat-raised-button color="primary" (click)="showInfo()">Show info</button>
-                <button mat-raised-button color="primary" (click)="showBalance()">Show P2SH balance and UTXOs</button>
-                <button mat-raised-button color="primary" (click)="redeem()">Redeem P2SH coins</button>
-            </mat-card-actions>
-        </mat-card>
+    <mat-card>
+        <h3>Check balance of time-locked address</h3>
+        <mat-form-field>
+            <input matInput placeholder="Time-locked address" [(ngModel)]="p2shAddress">
+        </mat-form-field>
+        <br>
+        <button mat-raised-button color="primary" (click)="showBalance( p2shAddress )">Check balance</button>
+    </mat-card>
 
-    </h1>
+    <mat-card>
+        <h3>Redeem time-locked coins</h3>
+        <mat-form-field>
+            <input matInput placeholder="Redeem script" [(ngModel)]="redeemScriptInput">
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+            <input matInput placeholder="Redeemer's private key" [(ngModel)]="redeemerPrivateKeyInput">
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+            <input matInput placeholder="Destination address" [(ngModel)]="destinationAddressInput">
+        </mat-form-field>
+        <br>
+        <button mat-raised-button color="primary" (click)="redeemToAddress( redeemScriptInput, redeemerPrivateKeyInput, destinationAddressInput )">Redeem time-locked coins</button>
+    </mat-card>
+
+    <!-- <img src="{{addressQrData}}" width="200" height="200" alt="QR code"> -->
 </div>

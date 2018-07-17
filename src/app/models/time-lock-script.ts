@@ -12,11 +12,10 @@ export interface TimeLockScriptInterface {
      * Builds the redeemScript for a new time-locked P2SH.
      * @param {number} timeLockInSeconds The time that the coins sent to this P2SH will be available to spend.
      *  The number should represent the seconds since 1970-01-01 00:00:00 UTC.
-     * @param {Bitcore.Address | Bitcore.PublicKey} payTo The address or public key that can spend the coins sent to this P2SH.
-     *  If creating a P2PKH-style time-locked script, pass an Address. If creating a P2PK-style script, pass a PublicKey.
+     * @param {Bitcore.PrivateKey} payTo The private key that can spend the coins sent to this P2SH.
      * @returns {Bitcore.Script} The redeemScript.
      */
-    buildRedeemScript( timeLockInSeconds: number, payTo: Bitcore.Address | Bitcore.PublicKey ): Bitcore.Script;
+    buildRedeemScript( timeLockInSeconds: number, payTo: Bitcore.PrivateKey ): Bitcore.Script;
 
     /**
      * Builds a scriptSig which can be used to spend coins from a tx that sent coins to a time-locked P2SH
@@ -38,12 +37,12 @@ export class TimeLockPubKey implements TimeLockScriptInterface {
         return 45 + 156 * numUTXOs;
     }
 
-    buildRedeemScript( timeLockInSeconds: number, payTo: Bitcore.PublicKey ): Bitcore.Script {
+    buildRedeemScript( timeLockInSeconds: number, payTo: Bitcore.PrivateKey ): Bitcore.Script {
         return Bitcore.Script()
         .add( Bitcore.crypto.BN.fromNumber( timeLockInSeconds ).toScriptNumBuffer() )
         .add( 'OP_CHECKLOCKTIMEVERIFY')
         .add( 'OP_DROP' )
-        .add( new Buffer(payTo.toBuffer()) )
+        .add( new Buffer(payTo.toPublicKey().toBuffer()) )
         .add( 'OP_CHECKSIG' );
     }
 
@@ -65,12 +64,12 @@ export class TimeLockPubKeyHash implements TimeLockScriptInterface {
         return 45 + 180 * numUTXOs;
     }
 
-    buildRedeemScript( timeLockInSeconds: number, payTo: Bitcore.Address ): Bitcore.Script {
+    buildRedeemScript( timeLockInSeconds: number, payTo: Bitcore.PrivateKey ): Bitcore.Script {
         return Bitcore.Script()
         .add( Bitcore.crypto.BN.fromNumber( timeLockInSeconds ).toScriptNumBuffer() )
         .add( 'OP_CHECKLOCKTIMEVERIFY')
         .add( 'OP_DROP' )
-        .add( Bitcore.Script.buildPublicKeyHashOut(payTo) );
+        .add( Bitcore.Script.buildPublicKeyHashOut(payTo.toPublicKey().toAddress()) );
     }
 
     buildScriptSig( tx: Bitcore.Transaction, inputIndex: number, privateKey: Bitcore.PrivateKey, redeemScript: Bitcore.Script ): Bitcore.Script {

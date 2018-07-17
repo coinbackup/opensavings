@@ -78,8 +78,8 @@ export class BlockchainService {
             let serviceRequests = this.currentChain.insightURLs.map( url => {
                 return Promise.all([
                     this.fetchJSON( url + '/api/utils/estimatefee?nbBlocks=2' ),
-                    this.fetchJSON( url + '/api/utils/estimatefee?nbBlocks=3' ),
-                    this.fetchJSON( url + '/api/utils/estimatefee?nbBlocks=6' )
+                    this.fetchJSON( url + '/api/utils/estimatefee?nbBlocks=4' ),
+                    this.fetchJSON( url + '/api/utils/estimatefee?nbBlocks=8' )
                 ]);
             });
             this.raceToSuccess( serviceRequests )
