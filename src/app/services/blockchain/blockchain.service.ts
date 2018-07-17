@@ -12,19 +12,32 @@ export class BlockchainService {
     readonly blockchainTypes = {
         BTC: new BlockchainType(
             Bitcore.Networks.livenet,
-            ['https://insight.bitpay.com', 'https://blockexplorer.com', 'https://www.localbitcoinschain.com']
+            ['https://insight.bitpay.com',
+             'https://btc.blockdozer.com',
+             'https://blockexplorer.com',
+             'https://www.localbitcoinschain.com'
+            ]
         ),
         tBTC: new BlockchainType(
             Bitcore.Networks.testnet,
-            ['https://test-insight.bitpay.com', 'https://testnet.blockexplorer.com']
+            ['https://test-insight.bitpay.com',
+             'https://tbtc.blockdozer.com',
+             'https://testnet.blockexplorer.com'
+            ]
         ),
         BCH: new BlockchainType(
             Bitcore.Networks.livenet,
-            ['https://bch-insight.bitpay.com', 'https://bitcoincash.blockexplorer.com']
+            ['https://bch-insight.bitpay.com',
+             'https://blockdozer.com',
+             'https://bitcoincash.blockexplorer.com'
+            ]
         ),
         tBCH: new BlockchainType(
             Bitcore.Networks.testnet,
-            ['https://test-bch-insight.bitpay.com']
+            ['https://test-bch-insight.bitpay.com',
+             'https://tbch.blockdozer.com'
+             // There's probably a test-bch blockexplorer site, but I coudln't find it...
+            ]
         )
     };
 
