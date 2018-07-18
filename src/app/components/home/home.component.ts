@@ -22,7 +22,6 @@ import { TimeLockPubKey, TimeLockPubKeyHash, TimeLockScriptInterface } from '../
 import { BlockchainService } from '../../services/blockchain/blockchain.service';
 import * as Bitcore from 'bitcore-lib';
 import * as QRCode from 'qrcode';
-import { resolve } from 'dns';
 
 @Component({
     selector: 'app-home',
