@@ -69,5 +69,12 @@ export class BlockchainTypes {
         ]
     );
 
+    public static allTypes: BlockchainType[] = [
+        BlockchainTypes.BTC,
+        BlockchainTypes.tBTC,
+        BlockchainTypes.BCH,
+        BlockchainTypes.tBCH
+    ];
+
     constructor() {}
 }
