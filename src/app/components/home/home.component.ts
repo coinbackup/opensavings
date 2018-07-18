@@ -18,9 +18,12 @@ import { Component, OnInit, Input } from '@angular/core';
  */
 
 //@@
-import { TimeLockPubKey, TimeLockPubKeyHash, TimeLockScriptInterface } from '../../models/time-lock-script';
+import { BlockchainTypes } from '../../models/blockchain-types';
 import { BlockchainService } from '../../services/blockchain/blockchain.service';
+import { TimeLockTypes } from '../../models/time-lock-types';
+import { TimeLockService } from '../../services/time-lock/time-lock.service';
 import * as Bitcore from 'bitcore-lib';
+import * as BitcoreCash from 'bitcore-lib-cash';
 import * as QRCode from 'qrcode';
 
 @Component({
@@ -31,32 +34,34 @@ import * as QRCode from 'qrcode';
 export class HomeComponent implements OnInit {
 
     addressQrData: string;
-    
-    readonly scriptType: TimeLockScriptInterface = new TimeLockPubKeyHash();
 
-    constructor( private blockchainService: BlockchainService ) {
-        blockchainService.setBlockchain( this.blockchainService.blockchainTypes.tBTC );
+    constructor( private _blockchainService: BlockchainService, private _timeLockService: TimeLockService ) {
+        this._blockchainService.setBlockchainType( BlockchainTypes.tBCH );
+        this._timeLockService.setTimeLockType( TimeLockTypes.PKH );
     }
 
-    createTimeLockedAddress( lockTimeSeconds ) {
-        let privateKey = new Bitcore.PrivateKey( 'cPuXSjN4RACUvL3DXjdmw343bzwvSBnRQWfbrMCe3776hxW4mDvp' ); // @@ use a fresh key each time
-        let address = privateKey.toPublicKey().toAddress();
-        let redeemScript = this.scriptType.buildRedeemScript( lockTimeSeconds, privateKey );
+    public createTimeLockedAddress( lockTimeSeconds ) {
+        let bitcoreLib = this.getBitcoreLib();
+
+        let privateKey = new bitcoreLib.PrivateKey( 'cPuXSjN4RACUvL3DXjdmw343bzwvSBnRQWfbrMCe3776hxW4mDvp' ); // @@ use a fresh key each time
+        let redeemScript = this._timeLockService.buildRedeemScript( lockTimeSeconds, privateKey );
 
         console.log({
             payTo: privateKey.toWIF(),
             redeemScript: redeemScript.toString(),
-            p2shAddress: Bitcore.Address.payingTo( redeemScript ).toString()
+            p2shAddress: bitcoreLib.Address.payingTo( redeemScript ).toString()
         });
     }
 
 
-    showBalance( p2shAddress ) {
-        this.blockchainService.getUTXOs( p2shAddress )
+    public showBalance( p2shAddress ) {
+        let bitcoreLib = this.getBitcoreLib();
+
+        this._blockchainService.getUTXOs( p2shAddress )
         .then( (utxos: any[]) => {
             // Add the available satoshis from all UTXOs
             let totalSatoshis = utxos.reduce( (total, utxo) => total + utxo.satoshis, 0 );
-            console.log( 'Balance: ' + Bitcore.Unit.fromSatoshis(totalSatoshis).toBTC() );
+            console.log( 'Balance: ' + bitcoreLib.Unit.fromSatoshis(totalSatoshis).toBTC() );
         })
         .catch( err => {
             console.error( err );
@@ -67,15 +72,16 @@ export class HomeComponent implements OnInit {
     // @@ instead of taking a redeemScript, should it just take a timestamp and pubkeyhash? No, because I want the user to be able to see the script.
     // @@ Also I should put the scriptSig conditions on the cheque
     // @@ Maybe just time and hash if the QR is super large.
-    redeemToAddress( fromRedeemScript: string, redeemerPrivateKeyWIF: string, toAddress: string ) {
+    public redeemToAddress( fromRedeemScript: string, redeemerPrivateKeyWIF: string, toAddress: string ) {
+        let bitcoreLib = this.getBitcoreLib();
 
-        let redeemScript = Bitcore.Script( fromRedeemScript );
-        let p2shAddress = Bitcore.Address.payingTo( redeemScript ).toString();
-        let privateKey = new Bitcore.PrivateKey( redeemerPrivateKeyWIF );
+        let redeemScript = bitcoreLib.Script( fromRedeemScript );
+        let p2shAddress = bitcoreLib.Address.payingTo( redeemScript ).toString();
+        let privateKey = new bitcoreLib.PrivateKey( redeemerPrivateKeyWIF );
 
-        this.blockchainService.getUTXOs( p2shAddress )
+        this._blockchainService.getUTXOs( p2shAddress )
         .then( (utxos:any[]) => this.buildRedeemTx(redeemScript, privateKey, toAddress, utxos) )
-        .then( tx => this.blockchainService.broadcastTx(tx) )
+        .then( tx => this._blockchainService.broadcastTx(tx) )
         .then( newTxId => console.log(newTxId) )
         .catch( err => {
             console.error( err );
@@ -85,28 +91,36 @@ export class HomeComponent implements OnInit {
 
     //QRCode.toDataURL( address.toString(), {width: 800} )
 
-    private buildRedeemTx( redeemScript: Bitcore.Script, redeemerPrivateKey: Bitcore.PrivateKey, toAddress: string, utxos: any[] ): Bitcore.Transaction {
+    private buildRedeemTx(
+        redeemScript: Bitcore.Script|BitcoreCash.Script,
+        redeemerPrivateKey: Bitcore.PrivateKey|BitcoreCash.PrivateKey,
+        toAddress: string,
+        utxos: any[]
+    ): Bitcore.Transaction|BitcoreCash.Transaction {
+
+        let bitcoreLib = this.getBitcoreLib();
+
         return new Promise( (resolve, reject) => {
             if ( utxos.length === 0 ) {
                 return reject( 'Empty! No UTXOs!' );
             }
 
-            this.blockchainService.getFeeRates().then( rates => {
+            this._blockchainService.getFeeRates().then( rates => {
         
                 // Extract the time lock expiry from the script
                 var timeLockBuf = redeemScript.chunks[0].buf;
-                var lockTimeSeconds = Bitcore.crypto.BN.fromBuffer( timeLockBuf, {endian: 'little'} ).toNumber();
+                var lockTimeSeconds = bitcoreLib.crypto.BN.fromBuffer( timeLockBuf, {endian: 'little'} ).toNumber();
                 
                 // Find the total amount avaialble to spend
                 let totalSatoshis = utxos.reduce( (total, utxo) => total + utxo.satoshis, 0 );
         
                 // Calculate a fee in Satoshis
-                let txSizeBytes = this.scriptType.getEstimatedTxSize( utxos.length );
+                let txSizeBytes = this._timeLockService.getEstimatedTxSize( utxos.length );
                 let feePerByte = rates.high; // @@ use a high fee for now
                 let fee = Math.round( feePerByte * txSizeBytes );
         
                 // Build the transaction to redeem the coins
-                let tx = new Bitcore.Transaction()
+                let tx = new bitcoreLib.Transaction()
                 .from( utxos )
                 .to( toAddress, totalSatoshis - fee )
                 // Must include nLockTime in order to spend CLTV-locked coins. Add one second to the lockTime for good measure
@@ -117,13 +131,16 @@ export class HomeComponent implements OnInit {
 
                 // Now that the transaction is completely built except for signatures, sign the inputs and replace the
                 // scriptSig on the inputs with new ones that will be able to spend the coins.
-                tx.inputs.forEach( (input, i) => input.setScript(this.scriptType.buildScriptSig( tx, i, redeemerPrivateKey, redeemScript )) );
+                tx.inputs.forEach( (input, i) => input.setScript(this._timeLockService.buildScriptSig( tx, i, redeemerPrivateKey, redeemScript )) );
 
                 resolve( tx );
             });
         });
     }
 
+    private getBitcoreLib() {
+        return this._blockchainService.getBlockchainType().bitcoreLib;
+    }
 
     ngOnInit() {
     }
