@@ -44,7 +44,7 @@ export class NetworkService {
             // start a timeout timer.
             if ( timeoutMs ) {
                 setTimeout(
-                    () => reject( new AppError(AppError.TYPES.SERVER, 'Connection timed out.') ),
+                    () => reject( new AppError(AppError.TYPES.FETCH, 'Connection timed out.') ),
                     this.timeoutMs
                 );
             }
