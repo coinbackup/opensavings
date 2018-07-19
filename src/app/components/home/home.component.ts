@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject, Input } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { AppError } from '../../models/error-types';
 
 /**
  * This tool creates a P2SH address. Sending coins to the address will time-lock the coins.
@@ -46,11 +47,11 @@ export class HomeComponent implements OnInit {
         return this._blockchainService.getBlockchainType();
     }
 
-    private _offsetMilliseconds = new Date().getTimezoneOffset() * 60 * 1000;
+    private _tzOffsetMilliseconds = new Date().getTimezoneOffset() * 60 * 1000;
 
     constructor( private _blockchainService: BlockchainService, private _timeLockService: TimeLockService, private _dialog: MatDialog ) {
-        // Initialize with local date and time
-        let nowOffset = new Date( new Date().getTime() - this._offsetMilliseconds ).toISOString();
+        // Initialize with current local date and time
+        let nowOffset = new Date( new Date().getTime() - this._tzOffsetMilliseconds ).toISOString();
         this.lockDate = nowOffset.substring( 0, 10 );
         this.lockTime = nowOffset.substring( 11, 16 );
 
@@ -65,7 +66,7 @@ export class HomeComponent implements OnInit {
     public createTimeLockedAddress( lockDate, lockTime ) {
         // Convert the local time inputs to Unix seconds
         let dateLocal = new Date( lockDate + 'T' + lockTime + ':00.000Z' );
-        let lockTimeSeconds = Math.round( (dateLocal.getTime() + this._offsetMilliseconds) / 1000 );
+        let lockTimeSeconds = Math.round( (dateLocal.getTime() + this._tzOffsetMilliseconds) / 1000 );
         
         // Generate P2SH CLTV redeemScript and address, spendable by a newly generated private key
         let bitcoreLib = this.getBitcoreLib();
@@ -90,6 +91,12 @@ export class HomeComponent implements OnInit {
     public showBalance( p2shAddress ) {
         let bitcoreLib = this.getBitcoreLib();
 
+        let addressError = bitcoreLib.Address.getValidationError( p2shAddress, bitcoreLib.Networks.defaultNetwork );
+        if ( addressError ) {
+            this.showErrorModal( new AppError(AppError.TYPES.OTHER, 'The address is invalid. (' + addressError.message + ')') );
+            return;
+        }
+
         this._blockchainService.getUTXOs( p2shAddress )
         .then( (utxos: any[]) => {
             // Add the available satoshis from all UTXOs
@@ -99,48 +106,48 @@ export class HomeComponent implements OnInit {
                 body: bitcoreLib.Unit.fromSatoshis(totalSatoshis).toBTC() + ' ' + this._blockchainService.getBlockchainType().shortName
             }});
         })
-        .catch( err => {
-            console.error( err );
-        });
+        .catch( err => this.showErrorModal(err) );
     }
 
 
     public redeem( redeemDataJSON: string, toAddress: string ) {
-        let data = JSON.parse( redeemDataJSON );
-        this.redeemToAddress( data.redeemScript, data.redeemKey, toAddress );
+
+        let data;
+        try {
+            data = JSON.parse( redeemDataJSON );
+            
+            this.redeemToAddress( data.redeemScript, data.redeemKey, toAddress )
+            .then( newTxId => {
+                this._dialog.open( BasicDialog, { data: {
+                    title: 'Success',
+                    body: 'Transaction ID: ' + newTxId
+                }});
+            })
+            .catch( err => this.showErrorModal(err) );
+
+        } catch( e ) {
+            this.showErrorModal( new AppError(AppError.TYPES.OTHER, 'Malformed redeem data. Did you copy/scan it correctly? (' + e.message + ')') );
+        }
+
     }
     
 
     // @@ Also I should put the scriptSig conditions on the cheque (what is added before redeemScript)
-    public redeemToAddress( fromRedeemScript: string, redeemerPrivateKeyWIF: string, toAddress: string ) {
+    private redeemToAddress( fromRedeemScript: string, redeemerPrivateKeyWIF: string, toAddress: string ) {
         let bitcoreLib = this.getBitcoreLib();
 
-        let redeemScript = bitcoreLib.Script( fromRedeemScript );
-        let p2shAddress = bitcoreLib.Address.payingTo( redeemScript ).toString();
-        let privateKey = new bitcoreLib.PrivateKey( redeemerPrivateKeyWIF );
-
-        this._blockchainService.getUTXOs( p2shAddress )
-        .then( (utxos:any[]) => this.buildRedeemTx(redeemScript, privateKey, toAddress, utxos) )
-        .then( tx => this._blockchainService.broadcastTx(tx) )
-        .then( newTxId => {
-            this._dialog.open( BasicDialog, { data: {
-                title: 'Success',
-                body: 'Transaction ID: ' + ( newTxId.result || newTxId ) // the format of the response can vary between BTC & BCH
-            }});
-        })
-        .catch( errs => {
-            // `errs` will be an array of errors returned by the many insight servers we query.
-            // If an error is a string, we want to display it.
-            let stringError = errs.find( err => typeof err === 'string' );
-            if ( stringError === undefined ) {
-                stringError = errs[0].message ? errs[0].message : JSON.stringify( errs[0] );
-            }
+        try {
+            let redeemScript = bitcoreLib.Script( fromRedeemScript );
+            let p2shAddress = bitcoreLib.Address.payingTo( redeemScript ).toString();
+            let privateKey = new bitcoreLib.PrivateKey( redeemerPrivateKeyWIF );
             
-            this._dialog.open( BasicDialog, { data: {
-                title: 'Error',
-                body: stringError
-            }});
-        });
+            return this._blockchainService.getUTXOs( p2shAddress )
+            .then( (utxos:any[]) => this.buildRedeemTx(redeemScript, privateKey, toAddress, utxos) )
+            .then( tx => this._blockchainService.broadcastTx(tx) );
+        } catch( e ) {
+            throw e;
+        }
+        
     }
 
 
@@ -157,11 +164,16 @@ export class HomeComponent implements OnInit {
 
         return new Promise( (resolve, reject) => {
             if ( utxos.length === 0 ) {
-                return reject( 'Empty! No UTXOs!' );
+                return reject( new AppError(AppError.TYPES.NO_BALANCE, 'Error redeeming coins: the time-locked address has no coins to spend.') );
+            }
+
+            // Verify that the toAddress is valid
+            let addressError = bitcoreLib.Address.getValidationError( toAddress, bitcoreLib.Networks.defaultNetwork );
+            if ( addressError ) {
+                return reject( new AppError(AppError.TYPES.OTHER, 'The destination address is invalid. (' + addressError.message + ')') );
             }
 
             this._blockchainService.getFeeRates().then( rates => {
-        
                 try {
                     // Extract the time lock expiry from the script
                     var timeLockBuf = redeemScript.chunks[0].buf;
@@ -191,10 +203,18 @@ export class HomeComponent implements OnInit {
 
                     resolve( tx );
                 } catch( e ) {
-                    reject( e );
+                    reject( new AppError(AppError.TYPES.OTHER, 'Unexpected error building a transaction: ' + e.message) );
                 }
-            });
+            })
+            .catch( err => reject(err) );
         });
+    }
+
+    private showErrorModal( error: AppError ) {
+        this._dialog.open( BasicDialog, { data: {
+            title: 'Error',
+            body: error.message
+        }});
     }
 
     private getBitcoreLib() {

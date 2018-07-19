@@ -24,7 +24,7 @@ export class BlockchainTypes {
         Bitcore.crypto.Signature.SIGHASH_ALL,
         [
             'https://insight.bitpay.com',
-            'https://btc.blockdozer.com',
+            //'https://btc.blockdozer.com',
             'https://blockexplorer.com',
             'https://www.localbitcoinschain.com'
         ]
@@ -38,7 +38,7 @@ export class BlockchainTypes {
         Bitcore.crypto.Signature.SIGHASH_ALL,
         [
             'https://test-insight.bitpay.com',
-            'https://tbtc.blockdozer.com',
+            //'https://tbtc.blockdozer.com',
             'https://testnet.blockexplorer.com'
         ]
     );
@@ -51,7 +51,7 @@ export class BlockchainTypes {
         BitcoreCash.crypto.Signature.SIGHASH_ALL | BitcoreCash.crypto.Signature.SIGHASH_FORKID,
         [
             'https://bch-insight.bitpay.com',
-            'https://blockdozer.com',
+            //'https://blockdozer.com',
             'https://bitcoincash.blockexplorer.com'
         ]
     );
@@ -64,7 +64,7 @@ export class BlockchainTypes {
         BitcoreCash.crypto.Signature.SIGHASH_ALL | BitcoreCash.crypto.Signature.SIGHASH_FORKID,
         [
             'https://test-bch-insight.bitpay.com',
-            'https://tbch.blockdozer.com'
+            //'https://tbch.blockdozer.com'
             // There's probably a test-bch blockexplorer site, but I coudln't find it...
         ]
     );

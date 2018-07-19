@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { AppError } from '../../models/error-types';
 
 @Injectable({
     providedIn: 'root'
@@ -13,9 +14,8 @@ export class NetworkService {
     // As soon as one promise resolves, resolve the master promise with that resolved value.
     // If all the promises reject, reject the master promise with an array of rejected values.
     // This is essentially an inverted Promise.all
-    // timeoutMs is optional. If not given, no timer is set.
-    public raceToSuccess( promises, timeoutMs?: number ): Promise<any> {
-        if ( timeoutMs === undefined ) timeoutMs = this.timeoutMs;
+    // The error handling assumes all promises will be from fetchJSON or postJSON.
+    public raceToSuccess( promises ): Promise<any> {
         return new Promise( (resolve, reject) => {
             Promise.all( promises.map( p => {
                 // If a request fails, count that as a resolution so it will keep
@@ -27,32 +27,44 @@ export class NetworkService {
                 );
             })).then(
                 // If '.all' resolved, we've just got an array of errors.
-                errors => reject( errors ),
+                errors => reject( this.getUsefulError(errors) ),
                 // If '.all' rejected, we've got the result we wanted.
                 val => resolve( val )
             );
-
-            if ( timeoutMs ) {
-                setTimeout( () => reject( 'Timed out.' ), timeoutMs );
-            }
         })
     }
 
     // Fetches and returns a Promise, but rejects on status != 200.
     // JSON-decodes a good result, and text-decodes a bad result
-    public fetchJSON( url: string, fetchOptions?: any ): Promise<any> {
+    // If timeoutMs is 0 or false, no timeout is set.
+    public fetchJSON( url: string, fetchOptions?: any, timeoutMs?: number ): Promise<any> {
+        if ( timeoutMs === undefined ) timeoutMs = this.timeoutMs;
+
         return new Promise( (resolve, reject) => {
+            // start a timeout timer.
+            if ( timeoutMs ) {
+                setTimeout(
+                    () => reject( new AppError(AppError.TYPES.SERVER, 'Connection timed out.') ),
+                    this.timeoutMs
+                );
+            }
+
+            // Make the HTTP call
             fetch( url, fetchOptions )
             .then( result => {
                 if ( result.status === 200 ) {
-                    result.json().then( data => resolve(data), err => reject(err) );
+                    result.json().then(
+                        data => resolve( data ),
+                        err => reject( new AppError(AppError.TYPES.UNEXPECTED, JSON.stringify(err)) )
+                    );
                 } else {
-                    result.text().then( data => reject(data), err => reject(err) );
+                    result.text().then(
+                        data => reject( new AppError(AppError.TYPES.SERVER, data) ),
+                        err => reject( new AppError(AppError.TYPES.UNEXPECTED, JSON.stringify(err)) )
+                    );
                 }
             })
-            .catch( err => {
-                reject( err );
-            })
+            .catch( err => reject( new AppError(AppError.TYPES.FETCH, err.message) ) )
         })
     }
 
@@ -63,5 +75,15 @@ export class NetworkService {
             redirect: 'follow',
             body: JSON.stringify( data )
         });
+    }
+
+    // selects the most useful error message from multiple.
+    private getUsefulError( errors ): AppError {
+        // If a server gave a response (4XX/5XX), return that response,
+        // otherwise return an error about not being able to make the request,
+        // otherwise return whatever error happened.
+        return errors.find( err => err.type === AppError.TYPES.SERVER )
+            || errors.find( err => err.type === AppError.TYPES.FETCH )
+            || errors[0];
     }
 }
