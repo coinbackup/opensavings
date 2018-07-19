@@ -65,26 +65,33 @@ export class HomeComponent implements OnInit {
 
     public createTimeLockedAddress( lockDate, lockTime ) {
         // Convert the local time inputs to Unix seconds
-        let dateLocal = new Date( lockDate + 'T' + lockTime + ':00.000Z' );
-        let lockTimeSeconds = Math.round( (dateLocal.getTime() + this._tzOffsetMilliseconds) / 1000 );
-        
-        // Generate P2SH CLTV redeemScript and address, spendable by a newly generated private key
-        let bitcoreLib = this.getBitcoreLib();
-        let privateKey = new bitcoreLib.PrivateKey();
-        let redeemScript = this._timeLockService.buildRedeemScript( lockTimeSeconds, privateKey );
-
-
-        let redeemData = {
-            redeemKey: privateKey.toWIF(),
-            redeemScript: redeemScript.toString(),
-        };
-        this._dialog.open( CreateAddressConfirmDialog, {
-            data: {
-                lockTime: new Date( lockTimeSeconds * 1000 ),
-                p2shAddress: bitcoreLib.Address.payingTo( redeemScript ).toString(),
-                redeemJSON: JSON.stringify( redeemData )
+        try {
+            let ms = Date.parse( lockDate + 'T' + lockTime + ':00.000Z' )
+            let lockTimeSeconds = Math.round( (ms + this._tzOffsetMilliseconds) / 1000 );
+            if ( isNaN(lockTimeSeconds) ) {
+                throw new Error( 'Invalid date.' );
             }
-        });
+            
+            // Generate P2SH CLTV redeemScript and address, spendable by a newly generated private key
+            let bitcoreLib = this.getBitcoreLib();
+            let privateKey = new bitcoreLib.PrivateKey();
+            let redeemScript = this._timeLockService.buildRedeemScript( lockTimeSeconds, privateKey );
+
+
+            let redeemData = {
+                redeemKey: privateKey.toWIF(),
+                redeemScript: redeemScript.toString(),
+            };
+            this._dialog.open( CreateAddressConfirmDialog, {
+                data: {
+                    lockTime: new Date( lockTimeSeconds * 1000 ),
+                    p2shAddress: bitcoreLib.Address.payingTo( redeemScript ).toString(),
+                    redeemJSON: JSON.stringify( redeemData )
+                }
+            });
+        } catch( e ) {
+            this.showErrorModal( e );
+        }
     }
 
 
@@ -111,10 +118,8 @@ export class HomeComponent implements OnInit {
 
 
     public redeem( redeemDataJSON: string, toAddress: string ) {
-
-        let data;
         try {
-            data = JSON.parse( redeemDataJSON );
+            let data = JSON.parse( redeemDataJSON );
             
             this.redeemToAddress( data.redeemScript, data.redeemKey, toAddress )
             .then( newTxId => {
@@ -128,7 +133,6 @@ export class HomeComponent implements OnInit {
         } catch( e ) {
             this.showErrorModal( new AppError(AppError.TYPES.OTHER, 'Malformed redeem data. Did you copy/scan it correctly? (' + e.message + ')') );
         }
-
     }
     
 
