@@ -56,11 +56,14 @@ export class BlockchainService {
             .then( fees => {
                 // Convert the somewhat odd response format into an object with high/medium/low properties.
                 // Also convert the returned BTC/kb units into satoshis/byte.
-                resolve({
-                    high: this.btcPerKbToSatoshisPerByte( fees[0]['2'] ),
-                    medium: this.btcPerKbToSatoshisPerByte( fees[1]['4'] ),
-                    low: this.btcPerKbToSatoshisPerByte( fees[2]['8'] )
-                });
+                let convertedFees = [ this.btcPerKbToSatoshisPerByte( fees[0]['2'] ), this.btcPerKbToSatoshisPerByte( fees[1]['4'] ), this.btcPerKbToSatoshisPerByte( fees[2]['8'] ) ];
+                // Sometimes the values can be negative (not sure why???). Correct these.
+                if ( convertedFees[1] <= 0 ) convertedFees[1] = convertedFees[2];
+                if ( convertedFees[0] <= 0 ) convertedFees[0] = convertedFees[1];
+                if ( convertedFees[0] <= 0 ) {
+                    return reject( 'Unable to get current transfer fees.' );
+                }
+                resolve( { high: convertedFees[0], medium: convertedFees[1], low: convertedFees[2] } );
             })
             .catch( err => reject(err) );
         });

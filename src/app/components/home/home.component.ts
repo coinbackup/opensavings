@@ -125,7 +125,7 @@ export class HomeComponent implements OnInit {
         .then( newTxId => {
             this._dialog.open( BasicDialog, { data: {
                 title: 'Success',
-                body: 'Transaction ID: ' + newTxId.result
+                body: 'Transaction ID: ' + ( newTxId.result || newTxId ) // the format of the response can vary between BTC & BCH
             }});
         })
         .catch( errs => {
