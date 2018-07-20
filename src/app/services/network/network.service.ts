@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AppError } from '../../models/error-types';
 
+// NetworkService provides raw tools to make ajax requests.
+
 @Injectable({
     providedIn: 'root'
 })

@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
-import { BlockchainType, BlockchainTypes } from '../../models/blockchain-types';
+import { BlockchainType, BlockchainExplorer } from '../../models/blockchain-types';
 import { NetworkService } from '../network/network.service';
 import { AppError } from '../../models/error-types';
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
+import * as CashAddr from 'bchaddrjs';
+
+// BlockchainService queries Insight endpoints and handles data from them.
 
 @Injectable({
     providedIn: 'root'
@@ -11,7 +14,7 @@ import * as BitcoreCash from 'bitcore-lib-cash';
 export class BlockchainService {
 
     // Select BTC by default
-    private _currentChain: BlockchainType = BlockchainTypes.BTC;
+    private _currentChain: BlockchainType = BlockchainType.BTC;
 
     constructor( private _networkService: NetworkService ) {}
 
@@ -31,13 +34,21 @@ export class BlockchainService {
      */
     public getUTXOs( address: string ): Promise<any> {
         // Query all services and return data from the fastest one
-        let serviceRequests = this._currentChain.insightURLs.map(
-            url => this._networkService.fetchJSON( url + '/api/addr/' + address + '/utxo' )
+        let serviceRequests = this._currentChain.explorers.map(
+            explorer => {
+                let convertedAddress = address;
+                if ( explorer.addrFormat === BlockchainExplorer.ADDR_FORMATS.LEGACY && this._currentChain.fork === BlockchainType.FORKS.BCH ) {
+                    convertedAddress = CashAddr.toLegacyAddress( address );
+                }
+                return this._networkService.fetchJSON( explorer.url + '/addr/' + convertedAddress + '/utxo' )
+            }
         );
         return this._networkService.raceToSuccess( serviceRequests ).
         then( utxos => {
             // For BCH, some servers don't return addresses in cashAddr format, and this breaks the code. The formatting needs to be fixed.
-            utxos.forEach( utxo => utxo.address = this._currentChain.fixAddress(utxo.address) );
+            if ( this._currentChain.fork === BlockchainType.FORKS.BCH ) {
+                utxos.forEach( utxo => utxo.address = CashAddr.toCashAddress(utxo.address) );
+            }
             return utxos;
         })
         .catch( err => {
@@ -59,11 +70,11 @@ export class BlockchainService {
         // The next block, the next 4 blocks, or the next 8 blocks
 
         // Get all three fee estmations from the same service, but use whichever service returns all three first.
-        let serviceRequests = this._currentChain.insightURLs.map( url => {
+        let serviceRequests = this._currentChain.explorers.map( explorer => {
             return Promise.all([
-                this._networkService.fetchJSON( url + '/api/utils/estimatefee?nbBlocks=2' ),
-                this._networkService.fetchJSON( url + '/api/utils/estimatefee?nbBlocks=4' ),
-                this._networkService.fetchJSON( url + '/api/utils/estimatefee?nbBlocks=8' )
+                this._networkService.fetchJSON( explorer.url + '/utils/estimatefee?nbBlocks=2' ),
+                this._networkService.fetchJSON( explorer.url + '/utils/estimatefee?nbBlocks=4' ),
+                this._networkService.fetchJSON( explorer.url + '/utils/estimatefee?nbBlocks=8' )
             ]);
         });
 
@@ -98,20 +109,18 @@ export class BlockchainService {
         let serializedTx = tx.serialize( true );
         console.log( serializedTx );
         // POST the tx to insight services.
-        let serviceRequests = this._currentChain.insightURLs.map(
-            url => this._networkService.postJSON( url + '/api/tx/send', { rawtx: serializedTx } )
+        let serviceRequests = this._currentChain.explorers.map(
+            explorer => this._networkService.postJSON( explorer.url + '/tx/send', { rawtx: serializedTx } )
         );
         return this._networkService.raceToSuccess( serviceRequests ).then(
             // the format of the response can vary between BTC & BCH
             response => response.txid.result || response.txid,
             err => {
                 if ( err.type === AppError.TYPES.SERVER ) {
-                    // Check for 'nonfinal' or 'non-final' in the returned error message.
-                    if ( err.message.toLowerCase().search(/non-?final/) >= 0 ) {
-                        err.message = 'Cannot redeem coins: the time lock has not yet expired.';
-                    } else {
-                        err.message = 'Error broadcasting transaction: ' + err.message;
-                    }
+                    // The server will return an error if the transaction is invalid, i.e. if the tx's
+                    // nLockTime is in the future, or if nLockTime is smaller than the CLTV value,
+                    // or if an address is invalid, or it's a double-spend attempt, etc.
+                    err.message = 'Error broadcasting transaction: ' + err.message;
                 } else if ( err.type === AppError.TYPES.FETCH ) {
                     err.message = 'Error: could not connect to blockchain nodes. Is your internet connection working? (' + err.message + ')';
                 } else {

@@ -1,99 +1,109 @@
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
-import * as CashAddr from 'bchaddrjs';
 
-export class BlockchainType {
+// Define a format for recording differences between blockchain explorers.
+export class BlockchainExplorer {
+    // Different kinds of APIs return data in different formats
+    public static API_TYPES = {
+        INSIGHT: 'INSIGHT'
+    };
+
+    // Some APIs only accept bitcoin cash API queries in the legacy format
+    public static ADDR_FORMATS = {
+        LEGACY: 'LEGACY',
+        CASH_ADDR: 'CASH_ADDR'
+    };
+
     constructor(
-        public shortName: string,
-        public longName: string,
-        public bitcoreLib: any,
-        public networkType: Bitcore.Network|BitcoreCash.Network,
-        public sigType: any,
-        public fixAddress: Function,
-        public insightURLs: string[]
+        public url: string,
+        public addrFormat: string = BlockchainExplorer.ADDR_FORMATS.LEGACY,
+        public type: string = BlockchainExplorer.API_TYPES.INSIGHT,
     ) {}
 }
 
-export class BlockchainTypes {
-    
-    // Define differences between different blockchains
+// Define a structure for storing differences between different blockchains
+export class BlockchainType {
 
-    // No conversion needed
-    public static BTCAddressFixer = function( address: string ): string {
-        return address;
-    }
-
-    // Convert BTC-style addresses to CashAddr format
-    public static BCHAddressFixer = function( address: string): string {
-        // .toCashAddress will convert legacy address format to cashaddr, and leave
-        // addresses that are already in cashaddr format unchanged
-        return CashAddr.toCashAddress( address );
-    }
-
+    public static FORKS = {
+        BTC: 'BTC',
+        BCH: 'BCH'
+    };
 
     public static BTC: BlockchainType = new BlockchainType(
         'BTC',
         'Bitcoin',
+        BlockchainType.FORKS.BTC,
         Bitcore,
         Bitcore.Networks.livenet,
         Bitcore.crypto.Signature.SIGHASH_ALL,
-        BlockchainTypes.BTCAddressFixer,
         [
-            'https://insight.bitpay.com',
-            //'https://btc.blockdozer.com',
-            'https://blockexplorer.com',
-            'https://www.localbitcoinschain.com'
+            new BlockchainExplorer( 'https://insight.bitpay.com/api' ),
+            new BlockchainExplorer( 'https://btc.blockdozer.com/api' ),
+            new BlockchainExplorer( 'https://blockexplorer.com/api' ),
+            new BlockchainExplorer( 'https://www.localbitcoinschain.com/api' ),
+            new BlockchainExplorer( 'https://insight.bitcoin.com/api' )
         ]
     );
 
     public static tBTC: BlockchainType = new BlockchainType(
         'tBTC',
         'Bitcoin (testnet)',
+        BlockchainType.FORKS.BTC,
         Bitcore,
         Bitcore.Networks.testnet,
         Bitcore.crypto.Signature.SIGHASH_ALL,
-        BlockchainTypes.BTCAddressFixer,
         [
-            'https://test-insight.bitpay.com',
-            //'https://tbtc.blockdozer.com',
-            'https://testnet.blockexplorer.com'
+            new BlockchainExplorer( 'https://test-insight.bitpay.com/api' ),
+            new BlockchainExplorer( 'https://tbtc.blockdozer.com/api' ),
+            new BlockchainExplorer( 'https://testnet.blockexplorer.com/api' )
         ]
     );
 
     public static BCH: BlockchainType = new BlockchainType(
         'BCH',
         'Bitcoin Cash',
+        BlockchainType.FORKS.BCH,
         BitcoreCash,
         BitcoreCash.Networks.livenet,
         BitcoreCash.crypto.Signature.SIGHASH_ALL | BitcoreCash.crypto.Signature.SIGHASH_FORKID,
-        BlockchainTypes.BCHAddressFixer,
         [
-            'https://bch-insight.bitpay.com',
-            //'https://bch.blockdozer.com',
-            //'https://bitcoincash.blockexplorer.com'
+            new BlockchainExplorer( 'https://bch-insight.bitpay.com/api',        BlockchainExplorer.ADDR_FORMATS.CASH_ADDR ), // good (accepts invalid txs)
+            new BlockchainExplorer( 'https://bch.blockdozer.com/api',            BlockchainExplorer.ADDR_FORMATS.CASH_ADDR ), // good (except for broadcasting tx)
+            //new BlockchainExplorer( 'https://bitcoincash.blockexplorer.com/api', BlockchainExplorer.ADDR_FORMATS.CASH_ADDR ), // bad (ECONNREFUSED)
+            new BlockchainExplorer( 'https://cashexplorer.bitcoin.com/api',      BlockchainExplorer.ADDR_FORMATS.LEGACY ) // good (accepts invalid txs)
         ]
     );
 
     public static tBCH: BlockchainType = new BlockchainType(
         'tBCH',
         'Bitcoin Cash (testnet)',
+        BlockchainType.FORKS.BCH,
         BitcoreCash,
         BitcoreCash.Networks.testnet,
         BitcoreCash.crypto.Signature.SIGHASH_ALL | BitcoreCash.crypto.Signature.SIGHASH_FORKID,
-        BlockchainTypes.BCHAddressFixer,
         [
-            'https://test-bch-insight.bitpay.com',
-            //'https://tbch.blockdozer.com'
+            new BlockchainExplorer( 'https://test-bch-insight.bitpay.com/api', BlockchainExplorer.ADDR_FORMATS.CASH_ADDR ),
+            new BlockchainExplorer( 'https://tbch.blockdozer.com/api', BlockchainExplorer.ADDR_FORMATS.CASH_ADDR )
             // There's probably a test-bch blockexplorer site, but I coudln't find it...
         ]
     );
 
     public static allTypes: BlockchainType[] = [
-        BlockchainTypes.BTC,
-        BlockchainTypes.tBTC,
-        BlockchainTypes.BCH,
-        BlockchainTypes.tBCH
+        BlockchainType.BTC,
+        BlockchainType.tBTC,
+        BlockchainType.BCH,
+        BlockchainType.tBCH
     ];
 
-    constructor() {}
+
+    constructor(
+        public shortName: string,
+        public longName: string,
+        public fork: string,
+        public bitcoreLib: any,
+        public networkType: Bitcore.Network|BitcoreCash.Network,
+        public sigType: any,
+        public explorers: BlockchainExplorer[]
+    ) {}
+    
 }

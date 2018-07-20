@@ -20,7 +20,7 @@ import { AppError } from '../../models/error-types';
  */
 
 //@@
-import { BlockchainType, BlockchainTypes } from '../../models/blockchain-types';
+import { BlockchainType } from '../../models/blockchain-types';
 import { BlockchainService } from '../../services/blockchain/blockchain.service';
 import { TimeLockTypes } from '../../models/time-lock-types';
 import { TimeLockService } from '../../services/time-lock/time-lock.service';
@@ -56,8 +56,8 @@ export class HomeComponent implements OnInit {
         this.lockTime = nowOffset.substring( 11, 16 );
 
         // Init blockchain select
-        this.blockchains = BlockchainTypes.allTypes;
-        this.selectedBlockchain = BlockchainTypes.BTC;
+        this.blockchains = BlockchainType.allTypes;
+        this.selectedBlockchain = BlockchainType.BTC;
 
         // Set default blockchain and lockscript type
         this._timeLockService.setTimeLockType( TimeLockTypes.PKH );
@@ -182,7 +182,10 @@ export class HomeComponent implements OnInit {
                     // Extract the time lock expiry from the script
                     var timeLockBuf = redeemScript.chunks[0].buf;
                     var lockTimeSeconds = bitcoreLib.crypto.BN.fromBuffer( timeLockBuf, {endian: 'little'} ).toNumber();
-                    
+                    if ( new Date(lockTimeSeconds*1000) > new Date() ) {
+                        reject( new AppError(AppError.TYPES.OTHER, 'Cannot redeem coins: the time lock has not yet expired.') );
+                    }
+
                     // Find the total amount avaialble to spend
                     let totalSatoshis = utxos.reduce( (total, utxo) => total + utxo.satoshis, 0 );
             
