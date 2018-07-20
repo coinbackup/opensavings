@@ -35,7 +35,12 @@ export class BlockchainService {
             url => this._networkService.fetchJSON( url + '/api/addr/' + address + '/utxo' )
         );
         return this._networkService.raceToSuccess( serviceRequests ).
-        catch( err => {
+        then( utxos => {
+            // For BCH, some servers don't return addresses in cashAddr format, and this breaks the code. The formatting needs to be fixed.
+            utxos.forEach( utxo => utxo.address = this._currentChain.fixAddress(utxo.address) );
+            return utxos;
+        })
+        .catch( err => {
             if ( err.type === AppError.TYPES.SERVER ) {
                 err.message = 'Error while getting unspent transaction outputs: ' + err.message;
             } else if ( err.type === AppError.TYPES.FETCH ) {
@@ -91,6 +96,7 @@ export class BlockchainService {
         // We can't verify this tx before broadcasting, because bitcore can't auto-verify nonstandard txs.
         // Pass true to serialize() to skip all verification tests.
         let serializedTx = tx.serialize( true );
+        console.log( serializedTx );
         // POST the tx to insight services.
         let serviceRequests = this._currentChain.insightURLs.map(
             url => this._networkService.postJSON( url + '/api/tx/send', { rawtx: serializedTx } )
