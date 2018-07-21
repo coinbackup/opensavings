@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BlockchainService } from '../blockchain/blockchain.service';
-import { BlockchainType } from '../../models/blockchain-types';
+import { BlockchainForks } from '../../models/blockchain-forks';
 import { TimeLockTypes } from '../../models/time-lock-types';
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
@@ -83,7 +83,7 @@ export class TimeLockService {
         let args = [ tx, privateKey, blockchainType.sigType, inputIndex, redeemScript ];
 
         // BCH requires adding number of satoshis to the sign method
-        if ( blockchainType.fork === BlockchainType.FORKS.BCH ) {
+        if ( blockchainType.fork === BlockchainForks.BCH ) {
             args.push( bitcoreLib.crypto.BN.fromNumber(tx.inputs[inputIndex].output.satoshis) );
         }
         

@@ -8,9 +8,13 @@ import { AppError } from '../../models/error-types';
 })
 export class NetworkService {
 
+    public static instance: NetworkService;
+
     public timeoutMs: number = 10000;
     
-    constructor() {}
+    constructor() {
+        NetworkService.instance = this;
+    }
 
     // Takes an array of Promises and returns a master Promise.
     // As soon as one promise resolves, resolve the master promise with that resolved value.

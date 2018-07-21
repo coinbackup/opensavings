@@ -147,7 +147,7 @@ export class HomeComponent implements OnInit {
             
             return this._blockchainService.getUTXOs( p2shAddress )
             .then( (utxos:any[]) => this.buildRedeemTx(redeemScript, privateKey, toAddress, utxos) )
-            .then( tx => this._blockchainService.broadcastTx(tx) );
+            .then( serializedTx => this._blockchainService.broadcastTx(serializedTx) );
         } catch( e ) {
             throw e;
         }
@@ -208,7 +208,12 @@ export class HomeComponent implements OnInit {
                     // scriptSig on the inputs with new ones that will be able to spend the coins.
                     tx.inputs.forEach( (input, i) => input.setScript(this._timeLockService.buildScriptSig( tx, i, redeemerPrivateKey, redeemScript )) );
 
-                    resolve( tx );
+                    // We can't verify this tx, because bitcore can't auto-verify nonstandard txs.
+                    // Pass true to serialize() to skip all verification tests.
+                    let serializedTx = tx.serialize( true );
+                    console.log( serializedTx );
+
+                    resolve( serializedTx );
                 } catch( e ) {
                     reject( new AppError(AppError.TYPES.OTHER, 'Unexpected error building a transaction: ' + e.message) );
                 }
