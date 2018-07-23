@@ -1,4 +1,4 @@
-import { IExplorer, InsightExplorer } from './explorer-types';
+import { IExplorer, InsightExplorer, BTCDotComExplorer } from './explorer-types';
 import { BlockchainForks } from './blockchain-forks';
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
@@ -18,7 +18,8 @@ export class BlockchainType {
             new InsightExplorer( 'https://btc.blockdozer.com' ),
             new InsightExplorer( 'https://blockexplorer.com' ),
             new InsightExplorer( 'https://insight.bitcoin.com' ),
-            new InsightExplorer( 'https://www.localbitcoinschain.com' )
+            new InsightExplorer( 'https://www.localbitcoinschain.com' ),
+            new BTCDotComExplorer( 'https://chain.api.btc.com' )
         ]
     );
 
@@ -46,8 +47,9 @@ export class BlockchainType {
         [
             new InsightExplorer( 'https://bch-insight.bitpay.com' ),            // good (except it accepts invalid txs)
             new InsightExplorer( 'https://bch.blockdozer.com' ),                // good (except I can't use it to broadcast txs)
-            //new InsightExplorer( 'https://bitcoincash.blockexplorer.com' ),     // bad (ECONNREFUSED)
-            new InsightExplorer( 'https://cashexplorer.bitcoin.com', true )     // good (except it accepts invalid txs)
+            //new InsightExplorer( 'https://bitcoincash.blockexplorer.com', false, false ),     // bad (ECONNREFUSED)
+            new InsightExplorer( 'https://cashexplorer.bitcoin.com', true, false ),    // good (except it accepts invalid txs)
+            new BTCDotComExplorer( 'https://bch-chain.api.btc.com' )
         ]
     );
 
@@ -61,7 +63,7 @@ export class BlockchainType {
         [
             new InsightExplorer( 'https://test-bch-insight.bitpay.com' ),
             new InsightExplorer( 'https://tbch.blockdozer.com' )
-            // There's probably a test-bch blockexplorer site, but I coudln't find it...
+            // There's probably a test-bch blockexplorer site, but I couldn't find it...
         ]
     );
 
