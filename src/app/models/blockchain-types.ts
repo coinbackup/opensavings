@@ -1,4 +1,4 @@
-import { IExplorer, InsightExplorer, BTCDotComExplorer } from './explorer-types';
+import { IExplorer, InsightExplorer, BTCDotComExplorer, CoinMarketCapExplorer } from './explorer-types';
 import { BlockchainForks } from './blockchain-forks';
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
@@ -19,7 +19,8 @@ export class BlockchainType {
             new InsightExplorer( 'https://blockexplorer.com' ),
             new InsightExplorer( 'https://insight.bitcoin.com' ),
             new InsightExplorer( 'https://www.localbitcoinschain.com' ),
-            new BTCDotComExplorer( 'https://chain.api.btc.com' )
+            new BTCDotComExplorer( 'https://chain.api.btc.com' ),
+            new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' )
         ]
     );
 
@@ -33,7 +34,8 @@ export class BlockchainType {
         [
             new InsightExplorer( 'https://test-insight.bitpay.com' ),
             new InsightExplorer( 'https://tbtc.blockdozer.com' ),
-            new InsightExplorer( 'https://testnet.blockexplorer.com' )
+            new InsightExplorer( 'https://testnet.blockexplorer.com' ),
+            new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' )
         ]
     );
 
@@ -49,7 +51,8 @@ export class BlockchainType {
             new InsightExplorer( 'https://bch.blockdozer.com' ),                // good (except I can't use it to broadcast txs)
             //new InsightExplorer( 'https://bitcoincash.blockexplorer.com', false, false ),     // bad (ECONNREFUSED)
             new InsightExplorer( 'https://cashexplorer.bitcoin.com', true, false ),    // good (except it accepts invalid txs)
-            new BTCDotComExplorer( 'https://bch-chain.api.btc.com' )
+            new BTCDotComExplorer( 'https://bch-chain.api.btc.com' ),
+            new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' ),
         ]
     );
 
@@ -61,9 +64,10 @@ export class BlockchainType {
         BitcoreCash.Networks.testnet,
         BitcoreCash.crypto.Signature.SIGHASH_ALL | BitcoreCash.crypto.Signature.SIGHASH_FORKID,
         [
-            new InsightExplorer( 'https://test-bch-insight.bitpay.com' ),
-            new InsightExplorer( 'https://tbch.blockdozer.com' )
+            new InsightExplorer( 'https://test-bch-insight.bitpay.com', false, false ),
+            new InsightExplorer( 'https://tbch.blockdozer.com' ),
             // There's probably a test-bch blockexplorer site, but I couldn't find it...
+            new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' )
         ]
     );
 

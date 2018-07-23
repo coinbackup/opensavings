@@ -147,3 +147,16 @@ export class BTCDotComExplorer extends Explorer implements IExplorer {
         }
     }
 }
+
+
+export class CoinMarketCapExplorer extends Explorer implements IExplorer {
+    constructor( public url: string ) {
+        super( url, true, false, false, false );
+    }
+
+    public getUSDRate(): Promise<number> {
+        let coinID: number = this.fork === BlockchainForks.BTC ? 1 : 1831;
+        return NetworkService.instance.fetchJSON( this.url + '/v2/ticker/' + coinID + '/' )
+        .then( response => response.data.quotes.USD.price );
+    }
+}
