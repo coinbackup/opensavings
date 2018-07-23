@@ -40,6 +40,8 @@ export class HomeComponent implements OnInit {
     lockTime: string;
     blockchains: BlockchainType[];
 
+    readonly version: number = 1;
+
     @Input() set selectedBlockchain( chain ) {
         this._blockchainService.setBlockchainType( chain );
     }
@@ -79,6 +81,8 @@ export class HomeComponent implements OnInit {
 
 
             let redeemData = {
+                version: this.version,
+                blockchain: this.selectedBlockchain.shortName,
                 redeemKey: privateKey.toWIF(),
                 redeemScript: redeemScript.toString(),
             };
@@ -119,9 +123,15 @@ export class HomeComponent implements OnInit {
 
     public redeem( redeemDataJSON: string, toAddress: string ) {
         try {
+            // Parse and verify the redeemData
             let data = JSON.parse( redeemDataJSON );
+            let keys = Object.keys( data );
+            let expectedKeys = [ 'version', 'blockchain', 'redeemScript', 'redeemKey' ];
+            expectedKeys.forEach( expectedKey => {
+                if ( keys.indexOf(expectedKey) === -1 ) throw new Error( 'Property "' + expectedKey + '" not found in input data' );
+            });
             
-            this.redeemToAddress( data.redeemScript, data.redeemKey, toAddress )
+            this.redeemToAddress( data.version, data.blockchain, data.redeemScript, data.redeemKey, toAddress )
             .then( newTxId => {
                 this._dialog.open( BasicDialog, { data: {
                     title: 'Success',
@@ -137,7 +147,14 @@ export class HomeComponent implements OnInit {
     
 
     // @@ Also I should put the scriptSig conditions on the cheque (what is added before redeemScript)
-    private redeemToAddress( fromRedeemScript: string, redeemerPrivateKeyWIF: string, toAddress: string ) {
+    private redeemToAddress( version: number, blockchain: string, fromRedeemScript: string, redeemerPrivateKeyWIF: string, toAddress: string ) {
+        // Do nothing with the version number yet. We'll use it if the code changes drastically
+
+        // Switch to the defined blockchain
+        let chain = BlockchainType[blockchain];
+        if ( chain === undefined ) throw new Error( 'Invalid blockchain type: "' + blockchain +'"' );
+        this.selectedBlockchain = chain;
+
         let bitcoreLib = this.getBitcoreLib();
 
         try {
