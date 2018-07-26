@@ -14,6 +14,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule, MatButtonModule, MatProgressSpinnerModule, MatInputModule } from '@angular/material';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 // NG Translate
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -23,8 +24,14 @@ import { ElectronService } from './providers/electron.service';
 
 import { WebviewDirective } from './directives/webview.directive';
 
+
 import { AppComponent } from './app.component';
-import { HomeComponent, CreateAddressConfirmDialog, BasicDialog } from './components/home/home.component';
+import { IntroComponent } from './components/intro/intro.component';
+import { CreateComponent } from './components/create/create.component';
+import { CheckBalanceComponent } from './components/check-balance/check-balance.component';
+import { RedeemComponent } from './components/redeem/redeem.component';
+import { HomeComponent, CreateAddressConfirmDialog } from './components/home/home.component';
+import { BasicDialog } from './dialogs/basic-dialog/basic-dialog.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -38,6 +45,11 @@ export function HttpLoaderFactory(http: HttpClient) {
         WebviewDirective,
         // Dialogs
         CreateAddressConfirmDialog,
+        BasicDialog,
+        IntroComponent,
+        CreateComponent,
+        CheckBalanceComponent,
+        RedeemComponent,
         BasicDialog
     ],
     entryComponents: [
@@ -60,6 +72,7 @@ export function HttpLoaderFactory(http: HttpClient) {
         MatCardModule, MatButtonModule, MatProgressSpinnerModule, MatInputModule,
         MatSelectModule,
         MatDialogModule,
+        MatToolbarModule
     ],
     providers: [ElectronService],
     bootstrap: [AppComponent]

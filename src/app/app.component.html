@@ -1,1 +1,9 @@
-<router-outlet></router-outlet>
+<mat-toolbar>
+    <a mat-raised-button color="primary" routerLink="/home" *ngIf="!['/', '/home'].includes(router.url)">Home</a>
+    <span class="spacer"></span>
+    <span>Coincheque</span>
+</mat-toolbar>
+
+<div class="page-container">
+    <router-outlet></router-outlet>
+</div>

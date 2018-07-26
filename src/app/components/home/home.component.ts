@@ -27,6 +27,7 @@ import { TimeLockService } from '../../services/time-lock/time-lock.service';
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
 import * as QRCode from 'qrcode';
+import { BasicDialog } from '../../dialogs/basic-dialog/basic-dialog.component';
 
 @Component({
     selector: 'app-home',
@@ -63,39 +64,6 @@ export class HomeComponent implements OnInit {
 
         // Set default blockchain and lockscript type
         this._timeLockService.setTimeLockType( TimeLockTypes.PKH );
-    }
-
-    public createTimeLockedAddress( lockDate, lockTime ) {
-        // Convert the local time inputs to Unix seconds
-        try {
-            let ms = Date.parse( lockDate + 'T' + lockTime + ':00.000Z' )
-            let lockTimeSeconds = Math.round( (ms + this._tzOffsetMilliseconds) / 1000 );
-            if ( isNaN(lockTimeSeconds) ) {
-                throw new Error( 'Invalid date.' );
-            }
-            
-            // Generate P2SH CLTV redeemScript and address, spendable by a newly generated private key
-            let bitcoreLib = this.getBitcoreLib();
-            let privateKey = new bitcoreLib.PrivateKey();
-            let redeemScript = this._timeLockService.buildRedeemScript( lockTimeSeconds, privateKey );
-
-
-            let redeemData = {
-                version: this.version,
-                blockchain: this.selectedBlockchain.shortName,
-                redeemKey: privateKey.toWIF(),
-                redeemScript: redeemScript.toString(),
-            };
-            this._dialog.open( CreateAddressConfirmDialog, {
-                data: {
-                    lockTime: new Date( lockTimeSeconds * 1000 ),
-                    p2shAddress: bitcoreLib.Address.payingTo( redeemScript ).toString(),
-                    redeemJSON: JSON.stringify( redeemData )
-                }
-            });
-        } catch( e ) {
-            this.showErrorModal( e );
-        }
     }
 
 
@@ -274,7 +242,8 @@ export class HomeComponent implements OnInit {
         </mat-form-field>
     </div>
     <div mat-dialog-actions>
-        <button mat-button color="accent" mat-dialog-close cdkFocusInitial>Close</button>
+        <button mat-button color="accent" mat-dialog-close>Close</button>
+        <button mat-button color="accent" cdkFocusInitial (click)="print()">Print</button>
     </div>    
     `,
 })
@@ -282,23 +251,9 @@ export class CreateAddressConfirmDialog {
     constructor(
         public dialogRef: MatDialogRef<CreateAddressConfirmDialog>,
         @Inject(MAT_DIALOG_DATA) public data: any ) {}
+
+        public print() {
+            console.log('printed');
+        }
 }
 
-
-@Component({
-    selector: 'basicDialog',
-    template: `
-    <h1 mat-dialog-title>{{data.title}}</h1>
-    <div mat-dialog-content>
-        {{data.body}}
-    </div>
-    <div mat-dialog-actions>
-        <button mat-button color="accent" mat-dialog-close cdkFocusInitial>Close</button>
-    </div>    
-    `,
-})
-export class BasicDialog {
-    constructor(
-        public dialogRef: MatDialogRef<BasicDialog>,
-        @Inject(MAT_DIALOG_DATA) public data: any ) {}
-}

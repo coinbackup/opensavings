@@ -1,9 +1,8 @@
+.container-not {
+    display: none;
+}
+
 .container {
-
-    background: #ddd;
-
-    padding: 2em;
-
     mat-form-field { width: 100% }
 
     mat-card {

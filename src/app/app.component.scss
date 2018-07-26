@@ -1,0 +1,16 @@
+mat-toolbar {
+    display: flex;
+
+    > .spacer {
+        flex: 1 1 auto;
+    }
+}
+
+.page-container {
+    display: block;
+    max-width: 800px;
+    padding: 2em;
+    margin: 0 auto;
+
+    border: 1px solid pink;
+}

@@ -1,10 +1,50 @@
 /* You can add global styles to this file, and also import other style files */
 
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+/* Custom angular theme */
+@import "~@angular/material/theming";
+
+@include mat-core();
+$color_primary: map-get( $mat-amber, A400 );
+$color_background: #4b5f98;
+$color_text: #ffffff;
+
+$theme: mat-light-theme( mat-palette($mat-amber,A700,A400,A700), mat-palette($mat-blue), mat-palette($mat-red) );
+
+@include angular-material-theme( $theme );
+
+
+/* App styles */
 
 html, body {
     margin: 0;
     padding: 0;
 
     height: 100%;
+
+    background: $color_background;
+    font-size: 18px;
 }
+
+h1 {
+    display: inline-block;
+    border-bottom: 2px solid $color_primary;
+    padding: 0 1em 0.5em 1em;
+
+    color: $color_text;
+    text-transform: uppercase;
+    font-size: 100%;
+}
+
+.action-button-container {
+    float: right;
+    min-width: 300px;
+    padding: 0.75em 1em 0 0;
+
+    border-top: 2px solid $color_primary;
+
+    button {
+        float: right;
+    }
+}
+
+
