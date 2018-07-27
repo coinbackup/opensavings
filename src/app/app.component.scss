@@ -1,16 +1,12 @@
-mat-toolbar {
-    display: flex;
-
-    > .spacer {
-        flex: 1 1 auto;
-    }
+mat-sidenav {
+    background: #333;
 }
 
-.page-container {
+mat-sidenav-content {
     display: block;
-    max-width: 800px;
+    position: relative;
+    min-height: 100vh;
     padding: 2em;
-    margin: 0 auto;
 
-    border: 1px solid pink;
+    background: #4b5f98;
 }

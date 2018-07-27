@@ -11,10 +11,12 @@ import { AppRoutingModule } from './app-routing.module';
 
 // NG material
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatCardModule, MatButtonModule, MatProgressSpinnerModule, MatInputModule } from '@angular/material';
+import { MatCardModule, MatButtonModule, MatProgressSpinnerModule, MatInputModule, MatNativeDateModule } from '@angular/material';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
-import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 // NG Translate
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -69,10 +71,12 @@ export function HttpLoaderFactory(http: HttpClient) {
                 deps: [HttpClient]
             }
         }),
-        MatCardModule, MatButtonModule, MatProgressSpinnerModule, MatInputModule,
+        MatCardModule, MatButtonModule, MatProgressSpinnerModule, MatInputModule, MatNativeDateModule,
         MatSelectModule,
         MatDialogModule,
-        MatToolbarModule
+        MatSidenavModule,
+        MatListModule,
+        MatDatepickerModule
     ],
     providers: [ElectronService],
     bootstrap: [AppComponent]

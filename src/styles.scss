@@ -8,12 +8,16 @@ $color_primary: map-get( $mat-amber, A400 );
 $color_background: #4b5f98;
 $color_text: #ffffff;
 
-$theme: mat-light-theme( mat-palette($mat-amber,A700,A400,A700), mat-palette($mat-blue), mat-palette($mat-red) );
+$theme: mat-dark-theme( mat-palette($mat-amber), mat-palette($mat-blue), mat-palette($mat-red) );
 
 @include angular-material-theme( $theme );
 
 
 /* App styles */
+
+* {
+    box-sizing: border-box;
+}
 
 html, body {
     margin: 0;
@@ -29,9 +33,14 @@ h1 {
     display: inline-block;
     border-bottom: 2px solid $color_primary;
     padding: 0 1em 0.5em 1em;
+    margin-bottom: 3em;
 
     color: $color_text;
     text-transform: uppercase;
+    font-size: 100%;
+}
+
+h2 {
     font-size: 100%;
 }
 
@@ -39,6 +48,7 @@ h1 {
     float: right;
     min-width: 300px;
     padding: 0.75em 1em 0 0;
+    margin-top: 3em;
 
     border-top: 2px solid $color_primary;
 
@@ -47,4 +57,34 @@ h1 {
     }
 }
 
+mat-sidenav-container .mat-list-item .mat-list-item-content {
+    padding: 0 !important;
 
+    > a {
+        width: 100%;
+        text-align: left;
+        &.active {
+            background: black;
+        }
+    }
+}
+
+form {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    > * {
+        flex: 1 0 auto;
+
+        &.whole { flex: 1 0 100% }
+        &.half { flex: 1 0 calc( 50% - 1em ) }
+        &.third { flex: 1 0 calc( 33% - 1em ) }
+        &.quarter { flex: 1 0 calc( 25% - 1em ) }
+    }
+
+    .mat-form-field-wrapper,
+    .mat-form-field-flex {
+        height: 100%;
+    }
+}

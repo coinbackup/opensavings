@@ -2,24 +2,27 @@
     Create a time-locked address
 </h1>
 
-<h3>Select blockchain</h3>
-<mat-form-field>
-    <mat-select placeholder="Blockchain" [(ngModel)]="selectedBlockchain">
-        <mat-option *ngFor="let chain of blockchains" [value]="chain">
-            {{chain.longName}}
-        </mat-option>
-    </mat-select>
-</mat-form-field>
+<form>
+    <mat-form-field class="whole" appearance="fill">
+        <mat-label>Blockchain</mat-label>
+        <mat-select placeholder="Blockchain" [(ngModel)]="selectedBlockchain" name="blockchain">
+            <mat-option *ngFor="let chain of blockchains" [value]="chain">
+                {{chain.longName}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
 
-
-<mat-form-field>
-    <input type="date" matInput placeholder="Unlock date" [(ngModel)]="lockDate">
-</mat-form-field>
-<br>
-<mat-form-field>
-    <input type="time" matInput placeholder="Unlock time" [(ngModel)]="lockTime">
-</mat-form-field>
-<br>
+    <mat-form-field class="half" appearance="fill">
+        <mat-label>Unlock date</mat-label>
+        <input matInput [matDatepicker]="dp" [(ngModel)]="lockDate" name="date">
+        <mat-datepicker #dp></mat-datepicker>
+    </mat-form-field>
+    <div></div>
+    <mat-form-field class="half" appearance="fill">
+        <mat-label>Unlock time</mat-label>
+        <input type="time" matInput placeholder="xx:xx" [(ngModel)]="lockTime" name="time">
+    </mat-form-field>
+</form>
 
 <div class="action-button-container">
     <button mat-raised-button color="primary" (click)="createTimeLockedAddress( lockDate, lockTime )">Create address</button>

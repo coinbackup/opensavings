@@ -1,9 +1,12 @@
-<mat-toolbar>
-    <a mat-raised-button color="primary" routerLink="/home" *ngIf="!['/', '/home'].includes(router.url)">Home</a>
-    <span class="spacer"></span>
-    <span>Coincheque</span>
-</mat-toolbar>
-
-<div class="page-container">
-    <router-outlet></router-outlet>
-</div>
+<mat-sidenav-container>
+    <mat-sidenav mode="side" opened>
+        <mat-list>
+            <mat-list-item *ngFor="let navItem of navItems">
+                <a mat-button isRoundButton="false" [routerLink]="navItem.link" routerLinkActive="active">{{navItem.label}}</a>
+            </mat-list-item>
+        </mat-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <router-outlet></router-outlet>
+    </mat-sidenav-content>
+</mat-sidenav-container>

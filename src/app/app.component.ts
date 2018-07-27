@@ -10,6 +10,25 @@ import { AppConfig } from '../environments/environment';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+    public readonly navItems = [
+        {
+            link: '/intro',
+            label: 'Intro'
+        }, {
+            link: '/home',
+            label: 'Home'
+        }, {
+            link: '/create',
+            label: 'Create address'
+        }, {
+            link: '/check-balance',
+            label: 'Check balance'
+        }, {
+            link: '/redeem',
+            label: 'Redeem coins'
+        }
+    ];
+
     constructor(public electronService: ElectronService,
         public router: Router,
         private translate: TranslateService) {

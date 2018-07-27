@@ -8,7 +8,7 @@ import { RedeemComponent } from './components/redeem/redeem.component';
 
 const routes: Routes = [
     {
-        path: '',
+        path: 'intro',
         component: IntroComponent
     }, {
         path: 'home',
@@ -22,6 +22,10 @@ const routes: Routes = [
     }, {
         path: 'redeem',
         component: RedeemComponent
+    }, {
+        path: '',
+        redirectTo: '/intro',
+        pathMatch: 'full'
     }
 ];
 
