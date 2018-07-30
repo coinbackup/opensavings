@@ -1,3 +1,14 @@
-<p>
-  check-balance works!
-</p>
+<h1>
+    Check balance of a time-locked address
+</h1>
+
+<form>
+    <mat-form-field class="whole" appearance="fill">
+        <mat-label>Time-locked address</mat-label>
+        <input matInput #lockedAddress>
+    </mat-form-field>
+</form>
+
+<div class="action-button-container">
+    <button mat-raised-button color="primary" (click)="checkBalance( lockedAddress.value )">Create address</button>
+</div>

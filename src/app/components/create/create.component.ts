@@ -39,9 +39,8 @@ export class CreateComponent implements OnInit {
         private _constants: ConstantsService
     ) {
         // Initialize with current local date and time
-        let nowOffset = new Date();
         this.lockDate = new Date();
-        this.lockTime = nowOffset.toISOString().substring( 11, 16 );
+        this.lockTime = new Date().toTimeString().substring( 0, 5 );
 
         // Init blockchain select
         this.blockchains = BlockchainType.allTypes;
@@ -99,6 +98,10 @@ export class CreateComponent implements OnInit {
             title: 'Error',
             body: e.message
         }});
+    }
+
+    public hi (a ) {
+        console.log(a);
     }
 
     ngOnInit() {

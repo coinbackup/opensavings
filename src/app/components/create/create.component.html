@@ -20,7 +20,7 @@
     <div></div>
     <mat-form-field class="half" appearance="fill">
         <mat-label>Unlock time</mat-label>
-        <input type="time" matInput placeholder="xx:xx" [(ngModel)]="lockTime" name="time">
+        <input type="time" matInput [(ngModel)]="lockTime" name="time">
     </mat-form-field>
 </form>
 
@@ -30,7 +30,15 @@
 
 <div *ngIf="addressInfo">
     <h2>Time-locked address created</h2>
-    <p><b>Time-locked address:</b> {{addressInfo.p2shAddress}}</p>
     <p><b>Unlock time:</b> {{addressInfo.lockTime.toLocaleString()}}</p>
-    <p><b>Redeem data:</b> {{addressInfo.redeemJSON}}</p>
+    <form>
+        <mat-form-field class="whole">
+            <mat-label>Address (send coins here to lock them)</mat-label>
+            <input matInput [value]="addressInfo.p2shAddress" readonly (click)="$event.target.select()">
+        </mat-form-field>
+        <mat-form-field class="whole">
+            <mat-label>Data needed to redeem the locked coins</mat-label>
+            <textarea matInput [matTextareaAutosize]="true" [value]="addressInfo.redeemJSON" readonly (click)="$event.target.select()"></textarea>
+        </mat-form-field>
+    </form>
 </div>

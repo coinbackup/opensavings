@@ -50,43 +50,11 @@ export class HomeComponent implements OnInit {
         return this._blockchainService.getBlockchainType();
     }
 
-    private _tzOffsetMilliseconds = new Date().getTimezoneOffset() * 60 * 1000;
-
+    
     constructor( private _blockchainService: BlockchainService, private _timeLockService: TimeLockService, private _dialog: MatDialog ) {
-        // Initialize with current local date and time
-        let nowOffset = new Date( new Date().getTime() - this._tzOffsetMilliseconds ).toISOString();
-        this.lockDate = nowOffset.substring( 0, 10 );
-        this.lockTime = nowOffset.substring( 11, 16 );
-
-        // Init blockchain select
-        this.blockchains = BlockchainType.allTypes;
-        this.selectedBlockchain = BlockchainType.BTC;
-
-        // Set default blockchain and lockscript type
-        this._timeLockService.setTimeLockType( TimeLockTypes.PKH );
     }
 
 
-    public showBalance( p2shAddress ) {
-        let bitcoreLib = this.getBitcoreLib();
-
-        let addressError = bitcoreLib.Address.getValidationError( p2shAddress, bitcoreLib.Networks.defaultNetwork );
-        if ( addressError ) {
-            this.showErrorModal( new AppError(AppError.TYPES.OTHER, 'The address is invalid. (' + addressError.message + ')') );
-            return;
-        }
-
-        this._blockchainService.getUTXOs( p2shAddress )
-        .then( (utxos: any[]) => {
-            // Add the available satoshis from all UTXOs
-            let totalSatoshis = utxos.reduce( (total, utxo) => total + utxo.satoshis, 0 );
-            this._dialog.open( BasicDialog, { data: {
-                title: 'Balance of time-locked address',
-                body: bitcoreLib.Unit.fromSatoshis(totalSatoshis).toBTC() + ' ' + this._blockchainService.getBlockchainType().shortName
-            }});
-        })
-        .catch( err => this.showErrorModal(err) );
-    }
 
 
     public redeem( redeemDataJSON: string, toAddress: string ) {
