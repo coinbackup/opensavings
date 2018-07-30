@@ -41,19 +41,23 @@ h1 {
 }
 
 h2 {
-    font-size: 100%;
+    color: $color_primary;
 }
 
 .action-button-container {
     float: right;
     min-width: 300px;
-    padding: 0.75em 1em 0 0;
+    padding: 0.75em 1em 2em 0;
     margin-top: 3em;
 
     border-top: 2px solid $color_primary;
 
     button {
         float: right;
+    }
+
+    + * {
+        clear: both;
     }
 }
 

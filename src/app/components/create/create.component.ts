@@ -14,11 +14,16 @@ import { BasicDialog } from '../../dialogs/basic-dialog/basic-dialog.component';
 })
 export class CreateComponent implements OnInit {
 
-    public lockDate: string;
+    public lockDate: Date;
     public lockTime: string;
     public blockchains: BlockchainType[];
 
-    private _tzOffsetMilliseconds = new Date().getTimezoneOffset() * 60 * 1000;
+    public addressInfo: any = false;
+    
+    // We'll let users set the date in the past. The genesis block was in 2009, so somewhere near that seems like a reasonable minimum date.
+    private minLockDate: Date = new Date( Date.UTC(2010,0,1) );
+    // nLockTIme is a 4-byte unsigned integer, so the max value (in seconds since 1970) ends up being in the year 2106
+    private maxLockDate: Date = new Date( Date.UTC(2106,0,1) );
 
     @Input() set selectedBlockchain( chain ) {
         this._blockchainService.setBlockchainType( chain );
@@ -34,9 +39,9 @@ export class CreateComponent implements OnInit {
         private _constants: ConstantsService
     ) {
         // Initialize with current local date and time
-        let nowOffset = new Date( new Date().getTime() - this._tzOffsetMilliseconds ).toISOString();
-        this.lockDate = nowOffset.substring( 0, 10 );
-        this.lockTime = nowOffset.substring( 11, 16 );
+        let nowOffset = new Date();
+        this.lockDate = new Date();
+        this.lockTime = nowOffset.toISOString().substring( 11, 16 );
 
         // Init blockchain select
         this.blockchains = BlockchainType.allTypes;
@@ -47,20 +52,28 @@ export class CreateComponent implements OnInit {
     }
 
 
-    public createTimeLockedAddress( lockDate, lockTime ) {
-        // Convert the local time inputs to Unix seconds
+    public createTimeLockedAddress( lockDate: Date, lockTime: string ) {
+        
         try {
-            let ms = Date.parse( lockDate + 'T' + lockTime + ':00.000Z' )
-            let lockTimeSeconds = Math.round( (ms + this._tzOffsetMilliseconds) / 1000 );
-            if ( isNaN(lockTimeSeconds) ) {
-                throw new Error( 'Invalid date.' );
-            }
+            if ( lockDate === null ) throw 'Invalid date.';
+            if ( lockTime === '' ) throw 'Invalid time.';
+            if ( this.lockDate < this.minLockDate ) throw 'Date must be after ' + this.minLockDate.toDateString();
+            if ( this.lockDate > this.maxLockDate ) throw 'Date must be before ' + this.maxLockDate.toDateString();
             
+            // Apply the time to the date
+            let submitDate = new Date( lockDate.getTime() );
+            let time = lockTime.split( ':' );
+            submitDate.setHours( parseInt(time[0]) );
+            submitDate.setMinutes( parseInt(time[1]) );
+            if ( isNaN(submitDate.getTime()) ) throw 'Invalid date.';
+
+            // Convert to seconds, UTC time
+            let lockTimeSeconds = Math.round( submitDate.getTime() / 1000 );
+
             // Generate P2SH CLTV redeemScript and address, spendable by a newly generated private key
             let bitcoreLib = this._blockchainService.getBlockchainType().bitcoreLib;
             let privateKey = new bitcoreLib.PrivateKey();
             let redeemScript = this._timeLockService.buildRedeemScript( lockTimeSeconds, privateKey );
-
 
             let redeemData = {
                 version: this._constants.version,
@@ -69,18 +82,23 @@ export class CreateComponent implements OnInit {
                 redeemScript: redeemScript.toString(),
             };
 
-            console.log({
+            this.addressInfo = {
                 lockTime: new Date( lockTimeSeconds * 1000 ),
                 p2shAddress: bitcoreLib.Address.payingTo( redeemScript ).toString(),
                 redeemJSON: JSON.stringify( redeemData )
-            });
+            };
 
         } catch( error ) {
-            this._dialog.open( BasicDialog, { data: {
-                title: 'Error',
-                body: error.message
-            }});
+            this.showError( error );
         }
+    }
+
+    public showError( e: Error | string ) {
+        if ( typeof e === 'string' ) e = new Error( e );
+        this._dialog.open( BasicDialog, { data: {
+            title: 'Error',
+            body: e.message
+        }});
     }
 
     ngOnInit() {

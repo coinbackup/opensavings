@@ -27,3 +27,10 @@
 <div class="action-button-container">
     <button mat-raised-button color="primary" (click)="createTimeLockedAddress( lockDate, lockTime )">Create address</button>
 </div>
+
+<div *ngIf="addressInfo">
+    <h2>Time-locked address created</h2>
+    <p><b>Time-locked address:</b> {{addressInfo.p2shAddress}}</p>
+    <p><b>Unlock time:</b> {{addressInfo.lockTime.toLocaleString()}}</p>
+    <p><b>Redeem data:</b> {{addressInfo.redeemJSON}}</p>
+</div>
