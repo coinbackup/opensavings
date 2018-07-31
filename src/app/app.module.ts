@@ -32,7 +32,7 @@ import { IntroComponent } from './components/intro/intro.component';
 import { CreateComponent } from './components/create/create.component';
 import { CheckBalanceComponent } from './components/check-balance/check-balance.component';
 import { RedeemComponent } from './components/redeem/redeem.component';
-import { HomeComponent, CreateAddressConfirmDialog } from './components/home/home.component';
+import { HomeComponent } from './components/home/home.component';
 import { BasicDialog } from './dialogs/basic-dialog/basic-dialog.component';
 
 // AoT requires an exported function for factories
@@ -46,7 +46,6 @@ export function HttpLoaderFactory(http: HttpClient) {
         HomeComponent,
         WebviewDirective,
         // Dialogs
-        CreateAddressConfirmDialog,
         BasicDialog,
         IntroComponent,
         CreateComponent,
@@ -55,7 +54,6 @@ export function HttpLoaderFactory(http: HttpClient) {
         BasicDialog
     ],
     entryComponents: [
-        CreateAddressConfirmDialog,
         BasicDialog
     ],
     imports: [

@@ -1,3 +1,28 @@
-<p>
-  redeem works!
-</p>
+<h1>
+    Redeem locked coins
+</h1>
+
+<form>
+    <form>
+        <mat-form-field class="whole" appearance="fill">
+            <mat-label>Data needed to redeem the locked coins</mat-label>
+            <textarea matInput [matTextareaAutosize]="true" [(ngModel)]="redeemJSON" name="json"></textarea>
+        </mat-form-field>
+        <mat-form-field class="whole" appearance="fill">
+            <mat-label>Address to send the locked coins to</mat-label>
+            <input matInput [(ngModel)]="destinationAddress" name="destinationAddress">
+        </mat-form-field>
+    </form>
+</form>
+
+<div class="action-button-container">
+    <button mat-raised-button color="primary" (click)="redeem( redeemJSON, destinationAddress )" [disabled]="buttonDisabled">
+        Redeem coins <span *ngIf="buttonDisabled"><mat-spinner diameter="20"></mat-spinner></span>
+    </button>
+</div>
+
+<div *ngIf="newTxId && !buttonDisabled">
+    <h2>Successfully redeemed locked coins</h2>
+    <p><b>Transaction ID:</b> {{newTxId}}</p>
+    <p><a [href]="selectedBlockchain.getTxExplorerLink(newTxId)" target="_blank">View on blockchain</a></p>
+</div>

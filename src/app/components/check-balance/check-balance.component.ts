@@ -16,6 +16,11 @@ export class CheckBalanceComponent implements OnInit {
 
     buttonDisabled: boolean = false;
 
+    balanceInfo = {
+        totalCoinsText: undefined,
+        totalUSDText: undefined
+    }
+
     constructor( private blockchainService: BlockchainService, private dialog: MatDialog ) { }
 
     public checkBalance( p2shAddress: string ) {
@@ -38,23 +43,25 @@ export class CheckBalanceComponent implements OnInit {
             // Set the correct blockchain/network
             this.blockchainService.setBlockchainType( chain );
             let bitcoreLib = this.blockchainService.getBlockchainType().bitcoreLib;
+            let totalCoins = 0;
 
             // Sum all UTXOs for the address
             this.blockchainService.getUTXOs( p2shAddress )
             .then( (utxos: any[]) => {
                 // Add the available satoshis from all UTXOs
                 let totalSatoshis = utxos.reduce( (total, utxo) => total + utxo.satoshis, 0 );
-                this.dialog.open( BasicDialog, { data: {
-                    title: 'Balance of time-locked address',
-                    body: bitcoreLib.Unit.fromSatoshis(totalSatoshis).toBTC() + ' ' + this.blockchainService.getBlockchainType().shortName
-                }});
+                totalCoins = bitcoreLib.Unit.fromSatoshis(totalSatoshis).toBTC();
+                this.balanceInfo.totalCoinsText = totalCoins + ' ' + this.blockchainService.getBlockchainType().shortName;
+                return this.blockchainService.getUSDRate()
+            })
+            .then( (USDPerCoin: number) => {
+                this.balanceInfo.totalUSDText = '$' + ( USDPerCoin * totalCoins ).toFixed( 2 );
             })
             .catch( err => this.showError(err) )
             ['finally']( () => this.buttonDisabled = false );
 
         } catch ( e ) {
             this.showError( e );
-        } finally {
             this.buttonDisabled = false;
         }
     }

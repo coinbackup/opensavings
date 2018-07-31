@@ -13,6 +13,7 @@ export class BlockchainType {
         Bitcore,
         Bitcore.Networks.livenet,
         Bitcore.crypto.Signature.SIGHASH_ALL,
+        ( txId ) => 'https://btc.blockdozer.com/tx/' + txId,
         [
             new InsightExplorer( 'https://insight.bitpay.com' ),
             new InsightExplorer( 'https://btc.blockdozer.com' ),
@@ -31,6 +32,7 @@ export class BlockchainType {
         Bitcore,
         Bitcore.Networks.testnet,
         Bitcore.crypto.Signature.SIGHASH_ALL,
+        ( txId ) => 'https://tbtc.blockdozer.com/tx/' + txId,
         [
             new InsightExplorer( 'https://test-insight.bitpay.com' ),
             new InsightExplorer( 'https://tbtc.blockdozer.com' ),
@@ -46,6 +48,7 @@ export class BlockchainType {
         BitcoreCash,
         BitcoreCash.Networks.livenet,
         BitcoreCash.crypto.Signature.SIGHASH_ALL | BitcoreCash.crypto.Signature.SIGHASH_FORKID,
+        ( txId ) => 'https://bch.blockdozer.com/tx/' + txId,
         [
             new InsightExplorer( 'https://bch-insight.bitpay.com' ),            // good (except it accepts invalid txs)
             new InsightExplorer( 'https://bch.blockdozer.com' ),                // good (except I can't use it to broadcast txs)
@@ -63,6 +66,7 @@ export class BlockchainType {
         BitcoreCash,
         BitcoreCash.Networks.testnet,
         BitcoreCash.crypto.Signature.SIGHASH_ALL | BitcoreCash.crypto.Signature.SIGHASH_FORKID,
+        ( txId ) => 'https://tbch.blockdozer.com/tx/' + txId,
         [
             new InsightExplorer( 'https://test-bch-insight.bitpay.com', false, false ),
             new InsightExplorer( 'https://tbch.blockdozer.com' ),
@@ -86,6 +90,7 @@ export class BlockchainType {
         public bitcoreLib: any,
         public networkType: Bitcore.Network|BitcoreCash.Network,
         public sigType: any,
+        public getTxExplorerLink: Function,
         public explorers: IExplorer[]
     ) {
         // Give a reference to some important things in each of the explorers
