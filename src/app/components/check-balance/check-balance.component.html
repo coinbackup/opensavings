@@ -10,5 +10,7 @@
 </form>
 
 <div class="action-button-container">
-    <button mat-raised-button color="primary" (click)="checkBalance( lockedAddress.value )">Create address</button>
+    <button mat-raised-button color="primary" (click)="checkBalance( lockedAddress.value )" [disabled]="buttonDisabled">
+        Check balance <span *ngIf="buttonDisabled"><mat-spinner diameter="20"></mat-spinner></span>
+    </button>
 </div>

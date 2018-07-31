@@ -14,9 +14,13 @@ import * as BitcoreCash from 'bitcore-lib-cash';
 })
 export class CheckBalanceComponent implements OnInit {
 
+    buttonDisabled: boolean = false;
+
     constructor( private blockchainService: BlockchainService, private dialog: MatDialog ) { }
 
     public checkBalance( p2shAddress: string ) {
+        this.buttonDisabled = true;
+        
         try {
             // Find the address' blockchain and network
             let chain: BlockchainType;
@@ -45,10 +49,13 @@ export class CheckBalanceComponent implements OnInit {
                     body: bitcoreLib.Unit.fromSatoshis(totalSatoshis).toBTC() + ' ' + this.blockchainService.getBlockchainType().shortName
                 }});
             })
-            .catch( err => this.showError(err) );
+            .catch( err => this.showError(err) )
+            ['finally']( () => this.buttonDisabled = false );
 
         } catch ( e ) {
             this.showError( e );
+        } finally {
+            this.buttonDisabled = false;
         }
     }
 
