@@ -28,7 +28,7 @@ import * as QRCode from 'qrcode';
 export class HomeComponent implements OnInit {
 
     addressQrData: string;
-    
+    showDeveloper: boolean = false;
     
     constructor() {
     }
