@@ -18,9 +18,20 @@
             font-weight: bold;
         }
         .app-loading > div {
-            width: 400px;
-            height: 400px;
+            width: 80%;
             margin: auto;
+            position: relative;
+        }
+        .app-loading img {
+            width: 100%;
+            max-width: 300px;
+            transform: translatey(0px);
+	        animation: float 5s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translatey(0) }
+            50% { transform: translatey(-20px) }
+            100% { transform: translatey(0) }
         }
     </style>
 </head>
