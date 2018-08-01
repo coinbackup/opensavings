@@ -81,6 +81,12 @@ mat-sidenav-content {
     padding: 0 20px;
     background: $color_primary;
     color: black;
+
+    img {
+        height: 30px;
+        vertical-align: middle;
+        margin-right: 0.5em;
+    }
 }
 
 mat-sidenav-container .mat-list-item .mat-list-item-content {
