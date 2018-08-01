@@ -42,7 +42,7 @@ h1 {
     font-size: 100%;
 }
 
-h2 {
+h2, h3, h4, h5 {
     color: $color_primary;
 }
 
@@ -73,6 +73,14 @@ mat-sidenav-content {
     + * {
         clear: both;
     }
+}
+
+.topbar {
+    height: 50px;
+    line-height: 50px;
+    padding: 0 20px;
+    background: $color_primary;
+    color: black;
 }
 
 mat-sidenav-container .mat-list-item .mat-list-item-content {

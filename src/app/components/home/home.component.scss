@@ -1,0 +1,32 @@
+.rotating-icon {
+    transition: all 0.25s;
+    &.upside-down { transform: rotate(-180deg) }
+}
+
+code {
+    background: black;
+    padding: 0.15em 0.4em;
+    border-radius: 0.2em;
+    color: #afa;
+}
+
+pre {
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 0.15em 0;
+    background: black;
+
+    code {
+        display: block;
+    }
+}
+
+p, pre, p code {
+    font-size: 85%;
+}
+
+mat-card {
+    margin-top: 1.5em;
+    clear: both;
+    h3 .material-icons { vertical-align: top }
+}

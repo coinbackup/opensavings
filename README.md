@@ -66,6 +66,7 @@ You can desactivate "Developer Tools" by commenting `win.webContents.openDevTool
 |`npm run ng:serve:web`| Execute the app in the browser |
 |`npm run build`| Build the app. Your built files are in the /dist folder. |
 |`npm run build:prod`| Build the app with Angular aot. Your built files are in the /dist folder. |
+|`npm run build:prod:web`| The same as above, but built to be deployed as a website. |
 |`npm run electron:local`| Builds your application and start electron
 |`npm run electron:linux`| Builds your application and creates an app consumable on linux system |
 |`npm run electron:windows`| On a Windows OS, builds your application and creates an app consumable in windows 32/64 bit systems |

@@ -24,7 +24,7 @@ const routes: Routes = [
         component: RedeemComponent
     }, {
         path: '',
-        redirectTo: '/intro',
+        redirectTo: '/home',
         pathMatch: 'full'
     }
 ];

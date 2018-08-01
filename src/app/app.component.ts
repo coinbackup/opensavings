@@ -11,10 +11,10 @@ import { AppConfig } from '../environments/environment';
 })
 export class AppComponent {
     public readonly navItems = [
-        {
+        /*{
             link: '/intro',
             label: 'Intro'
-        }, {
+        },*/ {
             link: '/home',
             label: 'Home'
         }, {

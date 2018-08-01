@@ -5,7 +5,7 @@ mat-sidenav {
 mat-sidenav-content {
     display: block;
     position: relative;
-    min-height: 100vh;
+    min-height: calc( 100vh - 50px );
     padding: 2em;
 
     background: #4b5f98;

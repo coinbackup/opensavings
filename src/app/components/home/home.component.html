@@ -1,7 +1,69 @@
 <div class="container">
     <!-- <p>{{ 'PAGES.HOME.TITLE' | translate }}</p> -->
     <!-- <img src="{{addressQrData}}" width="200" height="200" alt="QR code"> -->
-    <a mat-raised-button color="primary" routerLink="/create">Create a time-locked address</a><br>
-    <a mat-raised-button color="primary" routerLink="/check-balance">Check balance of a time-locked address</a><br>
-    <a mat-raised-button color="primary" routerLink="/redeem">Redeem coins from a time-locked address</a><br>
+
+    <p><b>Open Savings Initiative</b> lets you set aside cryptocurrency that can only be spent after a certain date. It's like
+    a certificate of deposit that you can add more money to anytime, but doesn't require a bank.</p>
+
+    <p>If you intend to give cryptocurrency to someone else, you can use <b>Open Savings Initiative</b> to create the crypto
+    equivalent of writing a check for a future date. Unlike traditional cheques, the crypto cheque can't bounce, can't be
+    cancelled, and is guaranteed to have the funds.</p>
+
+    <p>This app doesn't collect or store any personal data.</p>
+
+    <mat-card>
+        <h3><i class="material-icons">lock</i> Create a time-locked address</h3>
+        <p>Any coins sent to a time-locked address will be unspendable until a future date.</p>
+        <a mat-button routerLink="/create">Create address <i class="material-icons">chevron_right</i></a>
+    </mat-card>
+    <mat-card>
+        <h3><i class="material-icons">account_balance_wallet</i> Check the balance of a time-locked address</h3>
+        <p>See how many coins are stored in a time-locked address.</p>
+        <a mat-button routerLink="/check-balance">Check balance <i class="material-icons">chevron_right</i></a>
+    </mat-card>
+    <mat-card>
+        <h3><i class="material-icons">redeem</i> Redeem coins from a time-locked address</h3>
+        <p>Transfer all coins from a time-locked address to your wallet.</p>
+        <a mat-button routerLink="/redeem">Redeem coins <i class="material-icons">chevron_right</i></a>
+    </mat-card>
+
+    <mat-card>
+        <button mat-button (click)="showDeveloper = !showDeveloper">
+            I'm a developer. Tell me how this works.
+            <i class="material-icons rotating-icon" [class.upside-down]="showDeveloper">keyboard_arrow_down</i>
+        </button>
+
+        <div *ngIf="showDeveloper">
+            <p>
+                TL;DR&mdash;The app uses the <code>OP_CHECKLOCKTIMEVERIFY</code> opcode to build a pay-to-script-hash (P2SH) address. The coins sent to
+                the P2SH address are only spendable by a newly generated private key, which is given to the user for safe keeping, digitally or printed.
+                This effectively creates a time-locked paper wallet.
+            </p>
+            
+            <hr>
+            <p>The script used to build the P2SH (i.e. the "redeem script") is:</p>
+            <pre><code>&lt;timestamp&gt; OP_CHECKLOCKTIMEVERIFY OP_DROP OP_DUP OP_HASH160 &lt;pubKeyHash&gt; OP_EQUALVERIFY OP_CHECKSIG </code></pre>
+            <p>
+                This is a standard pay-to-pubkey-hash (P2PKH) script, but with a time-locking element added to it. The script to spend coins at this P2SH
+                address (i.e. the "scriptSig") is:
+            </p>
+            <pre><code>&lt;sig&gt; &lt;pubKey&gt; &lt;redeemScript&gt; </code></pre>
+            <p>
+                Just as with a common P2PKH transaction, only the owner of a specific address may spend the coins sent to the P2SH address. We'll call this person
+                the "recipient".
+            </p>
+            <p><code>&lt;timestamp&gt;</code> is a date and time specified by the user&mdash;the coins are unspendable until this time.</p>
+            <p><code>&lt;pubKeyHash&gt;</code> is the recipient's address.</p>
+            <p><code>&lt;sig&gt;</code> is the signature of the transaction, signed with the recipient's private key.</p>
+            <p><code>&lt;pubKey&gt;</code> is the recipient's public key.</p>
+            <p><code>&lt;redeemScript&gt;</code> is the serialized redeem script.</p>
+            <p>
+                The recipient's private key must be used in order to spend the time-locked coins, and typical wallets don't support spending from nonstandard
+                P2SH address like this one. To get around this problem (and <b>not</b> require the user to export his wallet's private keys in order to use them
+                in this app), the app generates a fresh private key to use as the recipient. The user must keep this private key safe.
+            </p>
+            <p>The user is given this new private key, along with the redeem script. This is all that's needed to spend the coins.</p>
+        </div>
+    </mat-card>
+    
 </div>
