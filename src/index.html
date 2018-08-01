@@ -8,8 +8,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .app-loading {
+            height: 100vh;
+            display: flex;
+            color: white;
+            text-align: center;
+            font-size: 30px;
+            font-weight: bold;
+        }
+        .app-loading > div {
+            width: 400px;
+            height: 400px;
+            margin: auto;
+        }
+    </style>
 </head>
 <body>
-    <app-root>Loading...</app-root>
+    <app-root>
+        <div class="app-loading">
+            <div>
+                <img src="./assets/img/opensavings_white.png" width="300"><br>
+                Loading...
+            </div>
+        </div>
+    </app-root>
 </body>
 </html>
