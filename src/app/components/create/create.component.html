@@ -30,16 +30,34 @@
 
 <div *ngIf="addressInfo">
     <h2>Time-locked address created</h2>
-    <h3>Copy all the information below</h3>
-    <p><b>Unlock time:</b> {{addressInfo.lockTime.toLocaleString()}}</p>
+    <button mat-raised-button color="primary" (click)="print('time-lock-print')">Print everything</button>
+    <p>Send coins to the address below to time-lock them. The coins will be locked until <b>{{addressInfo.lockTime.toLocaleString()}}.</b></p>
+    <div class="lock-address-info">
+        <img src="{{addressInfo.addressQRData}}" alt="QR code">
+        <form>
+            <mat-form-field class="whole">
+                <input matInput [value]="addressInfo.p2shAddress" readonly (click)="$event.target.select()">
+            </mat-form-field>
+        </form>
+    </div>
+
+    <p>Copy all the information below to a safe place, or print it. Whoever has this information can redeem the locked coins.</p>
     <form>
         <mat-form-field class="whole">
-            <mat-label>Address (send coins here to lock them)</mat-label>
-            <input matInput [value]="addressInfo.p2shAddress" readonly (click)="$event.target.select()">
-        </mat-form-field>
-        <mat-form-field class="whole">
-            <mat-label>Data needed to redeem the locked coins</mat-label>
             <textarea matInput [matTextareaAutosize]="true" [value]="addressInfo.redeemJSON" readonly (click)="$event.target.select()"></textarea>
         </mat-form-field>
     </form>
+
+    <div id="time-lock-print" class="hidden">
+        <h1>Time-locked {{this.redeemData.blockchain}} address<br><small>Send coins here to lock them until {{addressInfo.lockTime.toLocaleString()}}</small></h1>
+        <p>
+            <img src="{{addressInfo.addressQRData}}">
+        </p>
+        <p>{{addressInfo.p2shAddress}}</p>
+        <h1>How to redeem locked coins</h1>
+        <p>Use the Open Savings Initiative app to scan the QR code below. Anybody who has the below data can redeem the coins after the lock expires.</p>
+        <p>
+            <img src="{{addressInfo.redeemQRData}}">
+        </p>
+    </div>
 </div>

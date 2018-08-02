@@ -6,6 +6,7 @@ import { BlockchainType } from '../../models/blockchain-types';
 import { TimeLockTypes } from '../../models/time-lock-types';
 import { ConstantsService } from '../../services/constants/constants.service';
 import { BasicDialog } from '../../dialogs/basic-dialog/basic-dialog.component';
+import * as QRCode from 'qrcode';
 
 @Component({
     selector: 'app-create',
@@ -19,6 +20,7 @@ export class CreateComponent implements OnInit {
     public blockchains: BlockchainType[];
 
     public addressInfo: any = false;
+    public redeemData: any;
     
     // We'll let users set the date in the past. The genesis block was in 2009, so somewhere near that seems like a reasonable minimum date.
     private minLockDate: Date = new Date( Date.UTC(2010,0,1) );
@@ -74,21 +76,76 @@ export class CreateComponent implements OnInit {
             let privateKey = new bitcoreLib.PrivateKey();
             let redeemScript = this._timeLockService.buildRedeemScript( lockTimeSeconds, privateKey );
 
-            let redeemData = {
+            this.redeemData = {
                 version: this._constants.version,
                 blockchain: this.selectedBlockchain.shortName,
                 redeemKey: privateKey.toWIF(),
                 redeemScript: redeemScript.toString(),
             };
 
-            this.addressInfo = {
-                lockTime: new Date( lockTimeSeconds * 1000 ),
-                p2shAddress: bitcoreLib.Address.payingTo( redeemScript ).toString(),
-                redeemJSON: JSON.stringify( redeemData )
-            };
+            let p2shAddress = bitcoreLib.Address.payingTo( redeemScript ).toString();
+
+            // create QR code
+            Promise.all([
+                QRCode.toDataURL( p2shAddress, {scale:28} ),
+                QRCode.toDataURL( JSON.stringify(this.redeemData), {scale:28} )
+            ])
+            .then( dataURLs => {
+                this.addressInfo = {
+                    lockTime: new Date( lockTimeSeconds * 1000 ),
+                    p2shAddress: p2shAddress,
+                    redeemJSON: JSON.stringify( this.redeemData ),
+                    addressQRData: dataURLs[0],
+                    redeemQRData: dataURLs[1]
+                };
+            })
+            .catch( e => this.showError(e) );
 
         } catch( error ) {
             this.showError( error );
+        }
+    }
+
+    // print a single DOM element.
+    print( elementId: string ) {
+        let element: any = document.getElementById( elementId );
+        let oldScrollPos = this.scrollPos();
+        // copy the element's outerHTML to a new element, to be appended to the body
+        let printContainer = document.createElement( 'div' );
+        document.body.appendChild( printContainer );
+        printContainer.classList.add( 'print-this' );
+
+        let newElement: any = document.createElement( 'div' );
+        printContainer.appendChild( newElement );
+        newElement.outerHTML = element.outerHTML;
+        // need to reassign what newElement is pointing at since we touched outerHTML
+        newElement = printContainer.lastChild;
+
+        // set up the body with a special class to hide everything else
+        document.body.classList.add( 'print-single-element' );
+
+        window.print();
+        
+        // undo everything
+        document.body.classList.remove( 'print-single-element' );
+        document.body.removeChild( printContainer );
+        // restore the old scroll position
+        this.scrollPos( oldScrollPos );
+        // some browsers require a delay
+        setTimeout( () => {
+            if ( this.scrollPos() !== oldScrollPos ) {
+                this.scrollPos( oldScrollPos );
+            }
+        }, 150 );
+    }
+
+    // Get/set the body y-scroll position.
+    scrollPos( newValue?: number ) {
+        if ( newValue === undefined ) {
+            // get the scroll value.
+            return window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop || 0;
+        } else {
+            window.scroll( undefined, newValue );
         }
     }
 
@@ -98,10 +155,6 @@ export class CreateComponent implements OnInit {
             title: 'Error',
             body: e.message
         }});
-    }
-
-    public hi (a ) {
-        console.log(a);
     }
 
     ngOnInit() {

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import * as QRCode from 'qrcode';
 
 /**
  * This tool creates a P2SH address. Sending coins to the address will time-lock the coins.
@@ -29,10 +28,9 @@ export class HomeComponent implements OnInit {
 
     addressQrData: string;
     showDeveloper: boolean = false;
-    
+
     constructor() {
     }
-
 
     ngOnInit() {
     }
