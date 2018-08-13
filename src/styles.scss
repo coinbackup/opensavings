@@ -121,6 +121,8 @@ form {
     }
 }
 
+[hidden] { display: none !important }
+
 @media print {
     
     @page { margin: 2cm }

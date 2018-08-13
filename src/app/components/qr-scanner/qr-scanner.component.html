@@ -1,8 +1,8 @@
-<div class="video-wrapper" *ngIf="isVisible" [class.show]="isOpaque">
-    <p class="camera-loading" *ngIf="!showLoadingAnimation">Loading camera feed...</p>
-    <mat-spinner *ngIf="showLoadingAnimation"></mat-spinner>
-    <video class="camera-video" autoplay *ngIf="!showLoadingAnimation" #cameraVideo></video>
-    <p class="camera-instructions" *ngIf="showCameraInstructions">Hold the QR code up to the camera.</p>
+<div class="video-wrapper" [hidden]="!overlay.isVisible" [class.show]="overlay.isOpaque">
+    <p class="camera-loading" [hidden]="overlay.showLoadingAnimation">Loading camera feed...</p>
+    <mat-spinner [hidden]="!overlay.showLoadingAnimation"></mat-spinner>
+    <video class="camera-video" autoplay [hidden]="overlay.showLoadingAnimation" #cameraVideo></video>
+    <p class="camera-instructions" [hidden]="!overlay.showCameraInstructions">Hold the QR code up to the camera.</p>
     <p><button mat-raised-button color="primary" (click)="stopWebcam()">Cancel</button></p>
 </div>
 <canvas class="camera-canvas" #cameraCanvas></canvas>

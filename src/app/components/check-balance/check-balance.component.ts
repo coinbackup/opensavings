@@ -15,13 +15,18 @@ import * as BitcoreCash from 'bitcore-lib-cash';
 export class CheckBalanceComponent implements OnInit {
 
     buttonDisabled: boolean = false;
+    lockedAddress: string = '';
+    qrScanner = QrScannerComponent.instance;
 
     balanceInfo = {
         totalCoinsText: undefined,
         totalUSDText: undefined
-    }
+    };
 
-    constructor( private blockchainService: BlockchainService, private dialog: MatDialog ) { }
+    constructor( private blockchainService: BlockchainService, private dialog: MatDialog ) {
+        QrScannerComponent.onQrScanSuccess = decoded => this.lockedAddress = decoded;
+        QrScannerComponent.onQrScanFailure = message => this.showError( message );
+    }
 
     public checkBalance( p2shAddress: string ) {
         this.buttonDisabled = true;
@@ -72,10 +77,6 @@ export class CheckBalanceComponent implements OnInit {
             title: 'Error',
             body: e.message
         }});
-    }
-
-    scanQR() {
-        QrScannerComponent.instance.scanQR();
     }
 
     ngOnInit() {

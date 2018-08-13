@@ -3,15 +3,21 @@
 </h1>
 
 <form>
-    <button mat-stroked-button color="primary" (click)="scanQR()">Scan QR code</button>
+    <div *ngIf="qrScanner.getUserMediaIsSupported">
+        <button mat-stroked-button color="primary" (click)="qrScanner.scanQR()">Scan QR code</button>
+    </div>
+    <div *ngIf="qrScanner.getUserMediaIsSupported">
+        <input type="file" capture="camera" accept="image/*" (change)="qrScanner.onQRFileChange($event.target)">
+    </div>
+
     <mat-form-field class="whole" appearance="fill">
         <mat-label>Time-locked address</mat-label>
-        <input matInput #lockedAddress>
+        <input matInput name="lockedAddress" [(ngModel)]="lockedAddress">
     </mat-form-field>
 </form>
 
 <div class="action-button-container">
-    <button mat-raised-button color="primary" (click)="checkBalance( lockedAddress.value )" [disabled]="buttonDisabled">
+    <button mat-raised-button color="primary" (click)="checkBalance( lockedAddress )" [disabled]="buttonDisabled">
         Check balance <span *ngIf="buttonDisabled"><mat-spinner diameter="20"></mat-spinner></span>
     </button>
 </div>
