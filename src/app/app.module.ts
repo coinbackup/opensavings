@@ -34,6 +34,7 @@ import { CheckBalanceComponent } from './components/check-balance/check-balance.
 import { RedeemComponent } from './components/redeem/redeem.component';
 import { HomeComponent } from './components/home/home.component';
 import { BasicDialog } from './dialogs/basic-dialog/basic-dialog.component';
+import { QrScannerComponent } from './components/qr-scanner/qr-scanner.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -51,7 +52,8 @@ export function HttpLoaderFactory(http: HttpClient) {
         CreateComponent,
         CheckBalanceComponent,
         RedeemComponent,
-        BasicDialog
+        BasicDialog,
+        QrScannerComponent
     ],
     entryComponents: [
         BasicDialog

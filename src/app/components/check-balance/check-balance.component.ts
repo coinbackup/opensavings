@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material';
 import { BasicDialog } from '../../dialogs/basic-dialog/basic-dialog.component';
 import { BlockchainService } from '../../services/blockchain/blockchain.service';
 import { BlockchainType } from '../../models/blockchain-types';
-import * as CashAddr from 'bchaddrjs';
+import { QrScannerComponent } from '../qr-scanner/qr-scanner.component';
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
 
@@ -72,6 +72,10 @@ export class CheckBalanceComponent implements OnInit {
             title: 'Error',
             body: e.message
         }});
+    }
+
+    scanQR() {
+        QrScannerComponent.instance.scanQR();
     }
 
     ngOnInit() {
