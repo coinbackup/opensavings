@@ -5,6 +5,7 @@ import { AppError } from '../../models/error-types';
 import { BlockchainService } from '../../services/blockchain/blockchain.service';
 import { TimeLockService } from '../../services/time-lock/time-lock.service';
 import { BlockchainType } from '../../models/blockchain-types';
+import { QrScannerComponent } from '../qr-scanner/qr-scanner.component';
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
 
@@ -19,10 +20,13 @@ export class RedeemComponent implements OnInit {
     destinationAddress: string;
     buttonDisabled: boolean = false;
     newTxId: string;
+    qrScanner = QrScannerComponent.instance;
 
     private selectedBlockchain: BlockchainType;
 
-    constructor( private blockchainService: BlockchainService, private timeLockService: TimeLockService, private dialog: MatDialog ) {}
+    constructor( private blockchainService: BlockchainService, private timeLockService: TimeLockService, private dialog: MatDialog ) {
+        QrScannerComponent.onQrScanFailure = message => this.showErrorModal( new AppError(AppError.TYPES.OTHER, message) );
+    }
 
     public redeem( redeemDataJSON: string, toAddress: string ) {
         this.buttonDisabled = true;
@@ -140,6 +144,15 @@ export class RedeemComponent implements OnInit {
             })
             .catch( err => reject(err) );
         });
+    }
+
+    private scanQR( modelName ) {
+        QrScannerComponent.onQrScanSuccess = decoded => this[modelName] = decoded;
+        QrScannerComponent.instance.scanQR();
+    }
+    private onQRFileChange( modelName, targetElement ) {
+        QrScannerComponent.onQrScanSuccess = decoded => this[modelName] = decoded;
+        QrScannerComponent.instance.onQRFileChange( targetElement );
     }
 
     private showErrorModal( error: AppError ) {

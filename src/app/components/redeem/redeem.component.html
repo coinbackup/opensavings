@@ -3,16 +3,33 @@
 </h1>
 
 <form>
-    <form>
-        <mat-form-field class="whole" appearance="fill">
-            <mat-label>Data needed to redeem the locked coins</mat-label>
-            <textarea matInput [matTextareaAutosize]="true" [(ngModel)]="redeemJSON" name="json"></textarea>
-        </mat-form-field>
-        <mat-form-field class="whole" appearance="fill">
-            <mat-label>Address to send the locked coins to</mat-label>
-            <input matInput [(ngModel)]="destinationAddress" name="destinationAddress">
-        </mat-form-field>
-    </form>
+    <div class="qr-scan-buttons">
+        <div *ngIf="qrScanner.getUserMediaIsSupported" class="qr-video">
+            <button mat-stroked-button color="primary" (click)="scanQR('redeemJSON')">Scan QR code</button>
+        </div>
+        <div *ngIf="!qrScanner.getUserMediaIsSupported" class="qr-input">
+            <button mat-stroked-button color="primary">Scan QR code</button>
+            <input type="file" capture="camera" accept="image/*" (change)="onQRFileChange('redeemJSON', $event.target)">
+        </div>
+    </div>
+    <mat-form-field class="whole" appearance="fill">
+        <mat-label>Data needed to redeem the locked coins</mat-label>
+        <textarea matInput [matTextareaAutosize]="true" [(ngModel)]="redeemJSON" name="json"></textarea>
+    </mat-form-field>
+
+    <div class="qr-scan-buttons">
+        <div *ngIf="qrScanner.getUserMediaIsSupported" class="qr-video">
+            <button mat-stroked-button color="primary" (click)="scanQR('destinationAddress')">Scan QR code</button>
+        </div>
+        <div *ngIf="!qrScanner.getUserMediaIsSupported" class="qr-input">
+            <button mat-stroked-button color="primary">Scan QR code</button>
+            <input type="file" capture="camera" accept="image/*" (change)="onQRFileChange('destinationAddress', $event.target)">
+        </div>
+    </div>
+    <mat-form-field class="whole" appearance="fill">
+        <mat-label>Address to send the locked coins to</mat-label>
+        <input matInput [(ngModel)]="destinationAddress" name="destinationAddress">
+    </mat-form-field>
 </form>
 
 <div class="action-button-container">

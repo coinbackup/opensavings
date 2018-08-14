@@ -121,6 +121,24 @@ form {
     }
 }
 
+[hidden] { display: none !important }
+
+.qr-scan-buttons {
+    .qr-input {
+        position: relative;
+        input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 125px;
+            height: 36px;
+
+            opacity: 0.01;
+            cursor: pointer;
+        }
+    }
+}
+
 @media print {
     
     @page { margin: 2cm }

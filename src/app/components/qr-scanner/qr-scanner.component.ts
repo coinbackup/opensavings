@@ -10,6 +10,8 @@ import jsQR from 'jsqr';
 export class QrScannerComponent implements OnInit {
 
     public static instance: QrScannerComponent;
+    public static onQrScanSuccess: Function = (decoded) => {};
+    public static onQrScanFailure: Function = (message) => {};
 
     // initialize flags
     getUserMediaIsSupported: boolean = false;
@@ -22,12 +24,6 @@ export class QrScannerComponent implements OnInit {
         showCameraInstructions: false,
         isVisible: false,
         isOpaque: false
-    };
-
-    // initialize other config settings
-    config = {
-        onQrScanSuccess: ( a ) => {},
-        successText: 'Successfully scanned the QR code.'
     };
 
     private webcamIsOn: boolean = false;
@@ -72,15 +68,15 @@ export class QrScannerComponent implements OnInit {
                     
                     if ( decoded ) {
                         // return the decoded qr text
-                        this.config.onQrScanSuccess( decoded );
+                        QrScannerComponent.onQrScanSuccess( decoded.data );
                         this.qrScanSuccess = true;
                     } else {
                         // show qr 
-                        alert( 'Failed to read QR code.' );
+                        QrScannerComponent.onQrScanFailure( 'Failed to read QR code.' );
                     }
                     this.hideQROverlay();
                 });
-                img.addEventListener( 'error', () => alert('Failed to read QR code.') );
+                img.addEventListener( 'error', () => QrScannerComponent.onQrScanFailure('Failed to read QR code.') );
                 img.src = reader.result;
             }, false );
 
@@ -153,7 +149,7 @@ export class QrScannerComponent implements OnInit {
                             message = 'There was an error while turning the camera on: ' + ( e.message ? e.message : e.name );
                         }
                 }
-                alert( message );
+                QrScannerComponent.onQrScanFailure( message );
                 setTimeout( () => this.stopWebcam(), 100 );
             }
 
@@ -229,7 +225,7 @@ export class QrScannerComponent implements OnInit {
 
             if ( decoded ) {
                 // return the decoded qr text
-                this.config.onQrScanSuccess( decoded );
+                QrScannerComponent.onQrScanSuccess( decoded.data );
                 
                 this.stopWebcam( () => this.qrScanSuccess = true );
             } else {
