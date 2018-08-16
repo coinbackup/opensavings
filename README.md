@@ -1,101 +1,100 @@
-[![Angular Logo](./logo-angular.jpg)](https://angular.io/) [![Electron Logo](./logo-electron.jpg)](https://electron.atom.io/)
-
-[![Travis Build Status][build-badge]][build]
-[![Dependencies Status][dependencyci-badge]][dependencyci]
-[![Make a pull request][prs-badge]][prs]
-[![License](http://img.shields.io/badge/Licence-MIT-brightgreen.svg)](LICENSE.md)
-
-[![Watch on GitHub][github-watch-badge]][github-watch]
-[![Star on GitHub][github-star-badge]][github-star]
-[![Tweet][twitter-badge]][twitter]
+![Open Savings Initiative](./osi-logo.png)
 
 # Introduction
 
-Bootstrap and package your project with Angular 6(+) and Electron (Typescript + SASS + Hot Reload) for creating Desktop applications.
+Open Savings Initiative lets you set aside cryptocurrency that can only be spent after a certain date. It's like a certificate of deposit that you can add more money to anytime, but doesn't require a bank.
 
-Currently runs with:
+You can also use it to gift money that can't be spent until a certain date, like writing a cheque for a future date, except it can't bounce or be cancelled.
 
-- Angular v6.0.5
-- Electron v2.0.3
-- Electron Builder v20.13.4
+The app accomplishes this by utilizing features of the blockchain protocol, rather than depending on some custom infrastructure.
 
-With this sample, you can :
+The Open Savings Initiative app is built with Typescript, Anuglar, and Electron, and can be packaged for deployment to the web, or as a native Windows/Mac/Linux desktop app.
 
-- Run your app in a local development environment with Electron & Hot reload
-- Run your app in a production environment
-- Package your app into an executable file for Linux, Windows & Mac
+This project was bootstrapped from [maximegris/angular-electron](https://github.com/maximegris/angular-electron).
 
-## Getting Started
+The Open Savings Initiative logo was built from [two](https://www.iconfinder.com/icons/1175307/piggy_piggycoin_icon) [icons](https://www.iconfinder.com/icons/1175251/bitcoin_btc_cryptocurrency_icon) created by AllienWorks, licenced under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
 
-Clone this repository locally :
+The app was developed by [Ransom Christofferson](http://ransomchristofferson.com/) and the [Prestige IT](https://prestigeit.io/) team, with guidance from [Yeoman's Capital](https://www.yeomans.capital/).
 
-``` bash
-git clone https://github.com/maximegris/angular-electron.git
+
+# How it works
+
+TL;DR---The app uses the `OP_CHECKLOCKTIMEVERIFY` opcode to build a pay-to-script-hash (P2SH) address. The coins sent to the P2SH address are only spendable by a newly generated private key, which is given to the user for safe keeping, digitally or printed. This effectively creates a time-locked paper wallet.
+
+___
+
+The script used to build the P2SH (i.e. the "redeem script") is:
+
+```
+<timestamp> OP_CHECKLOCKTIMEVERIFY OP_DROP OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG
 ```
 
-Install dependencies with npm :
+This is a standard pay-to-pubkey-hash (P2PKH) script, but with a time-locking element added to it. The script to spend coins at this P2SH address (i.e. the "scriptSig") is:
+
+```
+<sig> <pubKey> <redeemScript>
+```
+
+Just as with a common P2PKH transaction, only the owner of a specific address may spend the coins sent to the P2SH address. We'll call this person the "recipient".
+
+
+`<timestamp>` is a date and time specified by the user---the coins are unspendable until this time.
+
+`<pubKeyHash>` is the recipient's address.
+
+`<sig>` is the signature of the transaction, signed with the recipient's private key.
+
+`<pubKey>` is the recipient's public key.
+
+`<redeemScript>` is the serialized redeem script.
+
+The recipient's private key must be used in order to spend the time-locked coins, and typical wallets don't support spending from nonstandard P2SH address like this one. To get around this problem (and **not** require the user to export his wallet's private keys in order to use them in this app), the app generates a fresh private key to use as the recipient. The user must keep this private key safe.
+
+The user is given this new private key, along with the redeem script. This is all that's needed to spend the coins.
+
+
+# Developing
+
+Clone this repository locally and install dependencies with npm:
 
 ``` bash
+git clone https://github.com/coinbackup/opensavings.git
+cd opensavings
 npm install
 ```
 
-There is an issue with `yarn` and `node_modules` that are only used in electron on the backend when the application is built by the packager. Please use `npm` as dependencies manager.
-
-
-If you want to generate Angular components with Angular-cli , you **MUST** install `@angular/cli` in npm global context.  
-Please follow [Angular-cli documentation](https://github.com/angular/angular-cli) if you had installed a previous version of `angular-cli`.
-
-``` bash
-npm install -g @angular/cli
-```
-
-## To build for development
-
-- **in a terminal window** -> npm start  
-
-Voila! You can use your Angular + Electron app in a local development environment with hot reload !
-
-The application code is managed by `main.ts`. In this sample, the app runs with a simple Angular App (http://localhost:4200) and an Electron window.  
-The Angular component contains an example of Electron and NodeJS native lib import.  
-You can desactivate "Developer Tools" by commenting `win.webContents.openDevTools();` in `main.ts`.
-
-## Included Commands
+## Dev & build commands
 
 |Command|Description|
 |--|--|
-|`npm run ng:serve:web`| Execute the app in the browser |
-|`npm run build`| Build the app. Your built files are in the /dist folder. |
-|`npm run build:prod`| Build the app with Angular aot. Your built files are in the /dist folder. |
-|`npm run build:prod:web`| The same as above, but built to be deployed as a website. |
-|`npm run electron:local`| Builds your application and start electron
-|`npm run electron:linux`| Builds your application and creates an app consumable on linux system |
-|`npm run electron:windows`| On a Windows OS, builds your application and creates an app consumable in windows 32/64 bit systems |
-|`npm run electron:mac`|  On a MAC OS, builds your application and generates a `.app` file of your application that can be run on Mac |
+|`npm start`| Run the app in electron |
+|`npm run ng:serve:web`| Run the app in the browser with hot reload (native libraries don't work in this mode) |
+|`npm run build:prod:web`| Build the app with Angular aot, packaged for deployment as a website. |
+|`npm run electron:linux`| Builds the app as a native linux application |
+|`npm run electron:windows`| On Windows, builds the app as a native Windows application |
+|`npm run electron:mac`| On Mac OS, builds the app as a native Mac application |
 
-**Your application is optimised. Only /dist folder and node dependencies are included in the executable.**
+See [maximegris/angular-electron](https://github.com/maximegris/angular-electron) for more dev/build commands.
 
-## Browser mode
+## Project layout
 
-Maybe you want to execute the application in the browser with hot reload ? You can do it with `npm run ng:serve:web`.  
-Note that you can't use Electron or NodeJS native libraries in this case. Please check `providers/electron.service.ts` to watch how conditional import of electron/Native libraries is done.
+### Creating the P2SH address and building transactions
 
-## Branch & Packages version
+The app uses `bitcore-lib` and `bitcore-lib-cash` to handle most operations. The custom P2SH address and scriptSig are built in `TimeLockService (services/time-lock/time-lock.service.ts)`.
 
-- Angular 4 & Electron 1 : Branch [angular4](https://github.com/maximegris/angular-electron/tree/angular4)
-- Angular 5 & Electron 1 : Branch [angular5](https://github.com/maximegris/angular-electron/tree/angular5)
-- Angular 6 & Electron 2 : (master)
+Transactions are built in `components/redeem/redeem.component.ts`.
 
-[build-badge]: https://travis-ci.org/maximegris/angular-electron.svg?branch=master
-[build]: https://travis-ci.org/maximegris/angular-electron.svg?branch=master
-[dependencyci-badge]: https://dependencyci.com/github/maximegris/angular-electron/badge
-[dependencyci]: https://dependencyci.com/github/maximegris/angular-electron
-[license-badge]: https://img.shields.io/badge/license-Apache2-blue.svg?style=flat
-[license]: https://github.com/maximegris/angular-electron/blob/master/LICENSE.md
-[prs-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
-[prs]: http://makeapullrequest.com
-[github-watch-badge]: https://img.shields.io/github/watchers/maximegris/angular-electron.svg?style=social
-[github-watch]: https://github.com/maximegris/angular-electron/watchers
-[github-star-badge]: https://img.shields.io/github/stars/maximegris/angular-electron.svg?style=social
-[github-star]: https://github.com/maximegris/angular-electron/stargazers
-[twitter]: https://twitter.com/intent/tweet?text=Check%20out%20angular-electron!%20https://github.com/maximegris/angular-electron%20%F0%9F%91%8D
-[twitter-badge]: https://img.shields.io/twitter/url/https/github.com/maximegris/angular-electron.svg?style=social
+### Interacting with the blockchain
+
+The app makes HTTP calls to certain bitcoin nodes which expose a public REST API to read data from the blockchain or broadcast transactions to it.
+
+```
+BlockchainService -> BlockchainType -> Explorer -> NetworkService
+```
+
+* To read from or broadcast to the blockchain, call methods on the `BlockchainService (services/blockchain/blockchain.service.ts)`. This service makes http requests to multiple APIs simultaneously, to achieve high availability.
+* APIs and endpoint URLs for BTC, BCH, and their testnets are defined in `BlockchainType (models/blockchain-types.ts)`.
+* API responses are handled and normalized in `Explorer` classes `(models/explorer-types.ts)`.
+* Raw http requests are handled in `NetworkService (services/network/network.service.ts)`.
+
+To add another API endpoint, define its behavior in `models/explorer-types.ts`, and add its URL in `models/blockchain-types.ts`.
