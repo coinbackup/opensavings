@@ -10,12 +10,13 @@ The app accomplishes this by utilizing features of the blockchain protocol, rath
 
 The Open Savings Initiative app is built with Typescript, Anuglar, and Electron, and can be packaged for deployment to the web, or as a native Windows/Mac/Linux desktop app.
 
-This project was bootstrapped from [maximegris/angular-electron](https://github.com/maximegris/angular-electron).
+## Acknowledgements
+
+This app was developed by [Ransom Christofferson](http://ransomchristofferson.com/) and the [Prestige IT](https://prestigeit.io/) team, with guidance from [Yeoman's Capital](https://www.yeomans.capital/).
+
+The project was bootstrapped from [maximegris/angular-electron](https://github.com/maximegris/angular-electron).
 
 The Open Savings Initiative logo was built from [two](https://www.iconfinder.com/icons/1175307/piggy_piggycoin_icon) [icons](https://www.iconfinder.com/icons/1175251/bitcoin_btc_cryptocurrency_icon) created by AllienWorks, licenced under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
-
-The app was developed by [Ransom Christofferson](http://ransomchristofferson.com/) and the [Prestige IT](https://prestigeit.io/) team, with guidance from [Yeoman's Capital](https://www.yeomans.capital/).
-
 
 # How it works
 
