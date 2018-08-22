@@ -175,3 +175,18 @@ form {
         img { width: 8cm }
     }
 }
+
+.narrow-only { display: none !important }
+
+@media only screen and (max-width: 480px ) {
+    body { font-size: 16px }
+    mat-sidenav { display: none !important }
+    mat-sidenav-content { margin-left: 0 !important }
+    .action-button-container,
+    h1 {
+        min-width: 0;
+        width: 100%;
+    }
+    .narrow-only { display: initial !important }
+    .wide-only { display: none !important }
+}

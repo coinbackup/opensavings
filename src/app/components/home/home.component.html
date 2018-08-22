@@ -30,10 +30,17 @@
     </mat-card>
 
     <mat-card>
-        <button mat-button (click)="showDeveloper = !showDeveloper">
+        <button mat-button (click)="showDeveloper = !showDeveloper" class="wide-only">
             I'm a developer. Tell me how this works.
             <i class="material-icons rotating-icon" [class.upside-down]="showDeveloper">keyboard_arrow_down</i>
         </button>
+        <div class="narrow-only">
+            I'm a developer.<br>
+            <button mat-button (click)="showDeveloper = !showDeveloper">
+                Tell me how this works.
+                <i class="material-icons rotating-icon" [class.upside-down]="showDeveloper">keyboard_arrow_down</i>
+            </button>
+        </div>
 
         <div *ngIf="showDeveloper">
             <p>
