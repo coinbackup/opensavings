@@ -1,45 +1,51 @@
-<h1>
-    Redeem locked coins
-</h1>
+<section>
+    <h1 class="has-image">
+        <img src="./assets/img/icons/coins.svg">
+        Redeem coins from a time-locked address
+    </h1>
 
-<form>
-    <div class="qr-scan-buttons">
-        <div *ngIf="qrScanner.getUserMediaIsSupported" class="qr-video">
-            <button mat-stroked-button color="primary" (click)="scanQR('redeemJSON')">Scan QR code</button>
+    <form>
+        <mat-form-field class="whole" appearance="fill">
+            <mat-label>Data needed to redeem the locked coins</mat-label>
+            <textarea matInput [matTextareaAutosize]="true" [(ngModel)]="redeemJSON" name="json"></textarea>
+        </mat-form-field>
+        <div class="qr-scan-buttons">
+            <div *ngIf="qrScanner.getUserMediaIsSupported" class="qr-video">
+                <button mat-button color="primary" (click)="scanQR('redeemJSON')">Scan QR code</button>
+            </div>
+            <div *ngIf="!qrScanner.getUserMediaIsSupported" class="qr-input">
+                <button mat-button color="primary">Scan QR code</button>
+                <input type="file" capture="camera" accept="image/*" (change)="onQRFileChange('redeemJSON', $event.target)">
+            </div>
         </div>
-        <div *ngIf="!qrScanner.getUserMediaIsSupported" class="qr-input">
-            <button mat-stroked-button color="primary">Scan QR code</button>
-            <input type="file" capture="camera" accept="image/*" (change)="onQRFileChange('redeemJSON', $event.target)">
+
+        <mat-form-field class="whole" appearance="fill">
+            <mat-label>Address to send the locked coins to</mat-label>
+            <input matInput [(ngModel)]="destinationAddress" name="destinationAddress">
+        </mat-form-field>
+        <div class="qr-scan-buttons">
+            <div *ngIf="qrScanner.getUserMediaIsSupported" class="qr-video">
+                <button mat-button color="primary" (click)="scanQR('destinationAddress')">Scan QR code</button>
+            </div>
+            <div *ngIf="!qrScanner.getUserMediaIsSupported" class="qr-input">
+                <button mat-button color="primary">Scan QR code</button>
+                <input type="file" capture="camera" accept="image/*" (change)="onQRFileChange('destinationAddress', $event.target)">
+            </div>
         </div>
+    </form>
+
+    <div class="action-button-container">
+        <button mat-raised-button color="primary" (click)="redeem( redeemJSON, destinationAddress )" [disabled]="buttonDisabled">
+            Redeem coins <span *ngIf="buttonDisabled"><mat-spinner diameter="20"></mat-spinner></span>
+        </button>
     </div>
-    <mat-form-field class="whole" appearance="fill">
-        <mat-label>Data needed to redeem the locked coins</mat-label>
-        <textarea matInput [matTextareaAutosize]="true" [(ngModel)]="redeemJSON" name="json"></textarea>
-    </mat-form-field>
+</section>
 
-    <div class="qr-scan-buttons">
-        <div *ngIf="qrScanner.getUserMediaIsSupported" class="qr-video">
-            <button mat-stroked-button color="primary" (click)="scanQR('destinationAddress')">Scan QR code</button>
-        </div>
-        <div *ngIf="!qrScanner.getUserMediaIsSupported" class="qr-input">
-            <button mat-stroked-button color="primary">Scan QR code</button>
-            <input type="file" capture="camera" accept="image/*" (change)="onQRFileChange('destinationAddress', $event.target)">
-        </div>
-    </div>
-    <mat-form-field class="whole" appearance="fill">
-        <mat-label>Address to send the locked coins to</mat-label>
-        <input matInput [(ngModel)]="destinationAddress" name="destinationAddress">
-    </mat-form-field>
-</form>
-
-<div class="action-button-container">
-    <button mat-raised-button color="primary" (click)="redeem( redeemJSON, destinationAddress )" [disabled]="buttonDisabled">
-        Redeem coins <span *ngIf="buttonDisabled"><mat-spinner diameter="20"></mat-spinner></span>
-    </button>
-</div>
-
-<div *ngIf="newTxId && !buttonDisabled">
-    <h2>Successfully redeemed locked coins</h2>
+<section *ngIf="newTxId && !buttonDisabled">
+    <h1 class="has-image">
+        <img src="./assets/img/icons/check.svg">
+        Success!
+    </h1>
     <p><b>Transaction ID:</b> {{newTxId}}</p>
     <p><a [href]="selectedBlockchain.getTxExplorerLink(newTxId)" target="_blank">View on blockchain</a></p>
-</div>
+</section>

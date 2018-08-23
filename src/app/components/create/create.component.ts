@@ -153,6 +153,7 @@ export class CreateComponent implements OnInit {
         if ( typeof e === 'string' ) e = new Error( e );
         this._dialog.open( BasicDialog, { data: {
             title: 'Error',
+            icon: './assets/img/icons/x.svg',
             body: e.message
         }});
     }

@@ -31,15 +31,39 @@ html, body {
     font-family: 'Open Sans', sans-serif;
 }
 
+section {
+    background: #444;
+    padding: 1.5em;
+    margin: 2em 0 3em 0;
+
+    &:after {
+        display: block;
+        clear: both;
+        content: '';
+    }
+}
+
 h1 {
     display: inline-block;
-    border-bottom: 2px solid $color_primary;
     padding: 0 1em 0.5em 1em;
-    margin-bottom: 3em;
+    margin-bottom: 2em;
+    position: relative;
 
     color: $color_text;
     text-transform: uppercase;
-    font-size: 100%;
+    font-size: 120%;
+
+    img {
+        position: absolute;
+        height: 4.2em;
+        left: 0;
+        bottom: 0em;
+    }
+
+    &.has-image {
+        margin-top: 0;
+        padding-left: 4.2em;
+    }
 }
 
 h2, h3, h4, h5 {
@@ -55,10 +79,7 @@ mat-sidenav-content {
 .action-button-container {
     float: right;
     min-width: 300px;
-    padding: 0.75em 1em 2em 0;
-    margin-top: 3em;
-
-    border-top: 2px solid $color_primary;
+    margin-top: 2em;
 
     button {
         float: right;
@@ -101,6 +122,18 @@ mat-sidenav-container .mat-list-item .mat-list-item-content {
     }
 }
 
+mat-dialog-container {
+    overflow: visible;
+    basicdialog h1 {
+        img {
+            height: 3em;
+        }
+        &.has-image {
+            padding-left: 2.5em;
+        }
+    }
+}
+
 form {
     display: flex;
     justify-content: space-between;
@@ -123,7 +156,8 @@ form {
 
 [hidden] { display: none !important }
 
-.qr-scan-buttons {
+mat-form-field + .qr-scan-buttons {
+    margin: -1.4em 0 1.4em 0;
     .qr-input {
         position: relative;
         input {
@@ -178,7 +212,7 @@ form {
 
 .narrow-only { display: none !important }
 
-@media only screen and (max-width: 480px ) {
+@media only screen and (max-width: 620px ) {
     body { font-size: 16px }
     mat-sidenav { display: none !important }
     mat-sidenav-content { margin-left: 0 !important }
@@ -189,4 +223,24 @@ form {
     }
     .narrow-only { display: initial !important }
     .wide-only { display: none !important }
+    section {
+        margin-top: 1em;
+    }
+}
+
+@media only screen and (max-width: 460px ) {
+    section { margin-top: 0 }
+    mat-sidenav-content { padding: 0 !important }
+    h1 {
+        img {
+            width: 2em;
+            height: auto;
+            left: 0;
+            top: 0;
+        }
+    
+        &.has-image {
+            padding-left: 2.3em;
+        }
+    }
 }

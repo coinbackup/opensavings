@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg id="master-artboard" viewBox="0 0 174 193" version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" style="enable-background:new 0 0 336 235.2;" width="174px" height="193px"><rect id="ee-background" x="0" y="0" width="174" height="193" style="fill: white; fill-opacity: 0; pointer-events: none;"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<title>mdpi/icons</title><g id="Group-10" transform="matrix(1.3565890789031982, 0, 0, 1.3565890789031982, 1.0728497505187988, 1.3373799324035645)">
+            <path d="M 124 57 A 21 10 0 0 1 103 67 A 21 10 0 0 1 82 57 A 21 10 0 0 1 103 47 A 21 10 0 0 1 124 57 Z" id="Oval-5" fill="#E4B02C"/>
+            <path d="M 119 57 A 16 8 0 0 1 103 65 A 16 8 0 0 1 87 57 A 16 8 0 0 1 103 49 A 16 8 0 0 1 119 57 Z" id="Oval-5" fill="#BB8D1A"/>
+            <path d="M89,64 L100.6,22.4204545" id="Line-4" stroke="#A55309" stroke-width="2" stroke-linecap="round" fill-rule="nonzero"/>
+            <path d="M114,49 L101.423077,22.4142857" id="Line-4" stroke="#A55309" stroke-width="2" stroke-linecap="round" fill-rule="nonzero"/>
+            <path d="M 63 29.454545974731445 L 108 11 L 108 21.545454025268555 L 63 40 Z" id="Rectangle-2" fill="#BDBDBD" fill-rule="nonzero"/>
+            <path d="M 98.55000305175781 11 L 108 11 L 63.45000076293945 30 L 54 30 Z" id="Rectangle-14" fill="#8D8D8D" fill-rule="nonzero"/>
+            <path d="M 67 0 L 77 15 L 77 128.20388793945312 L 67 139 Z" id="Rectangle-7" fill="#FFC94D"/>
+            <path d="M 51 20.242717742919922 L 67 0 L 67 139 L 51 139 Z" id="Rectangle-7" fill="#DCAA39"/>
+            <path d="M 51 20 L 67 20 L 77 15 L 67 0 Z" id="Path-22" fill-opacity="0.4" fill="#000000" fill-rule="nonzero"/>
+            <path d="M 50 94 A 25 12 0 0 1 25 106 A 25 12 0 0 1 0 94 A 25 12 0 0 1 25 82 A 25 12 0 0 1 50 94 Z" id="Oval-5" fill="#E4B02C"/>
+            <path d="M 45 94 A 20 9 0 0 1 25 103 A 20 9 0 0 1 5 94 A 20 9 0 0 1 25 85 A 20 9 0 0 1 45 94 Z" id="Oval-5" fill="#BB8D1A"/>
+            <path d="M7.5,101.5 L26.5,51.5" id="Line-4" stroke="#A55309" stroke-width="2" stroke-linecap="round" fill-rule="nonzero"/>
+            <path d="M40.5,84.5 L26.5,51.5" id="Line-4" stroke="#A55309" stroke-width="2" stroke-linecap="round" fill-rule="nonzero"/>
+            <path d="M 21 47 L 63 29 L 63 39.66666793823242 L 21 57 Z" id="Rectangle-2" fill="#BDBDBD" fill-rule="nonzero"/>
+            <path d="M 53.605262756347656 29 L 63 29 L 21 47 L 12 47 Z" id="Rectangle-14" fill="#8D8D8D" fill-rule="nonzero"/>
+            <path d="M 12 47 L 21 47 L 21 57 L 12 57 Z" id="Rectangle-20" fill="#6A6A6A" fill-rule="nonzero"/>
+            <path d="M 51 139 L 67 20 L 67 139 Z" id="Path-23" fill-opacity="0.15" fill="#000000" fill-rule="nonzero"/>
+            <path d="M 51 20 L 77 34 L 77 15 Z" id="Path-24" fill-opacity="0.15" fill="#000000" fill-rule="nonzero"/>
+            <path d="M 21 57 L 63 29 L 63 40 Z" id="Path-25" fill-opacity="0.15" fill="#000000" fill-rule="nonzero"/>
+            <path d="M 21 47 L 63 40 L 53.5 29 Z" id="Path-26" fill-opacity="0.1" fill="#000000" fill-rule="nonzero"/>
+            <path d="M 12 57 L 12 47 L 21 57 Z" id="Path-27" fill-opacity="0.1" fill="#000000" fill-rule="nonzero"/>
+            <path d="M 7.5 102.5 L 41.5 85 L 50 93.75 Z" id="Path-28" fill-opacity="0.15" fill="#000000" fill-rule="nonzero"/>
+            <path d="M 42.5 102.5 L 13 83.5 L 7.5 102.5 Z" id="Path-29" fill-opacity="0.1" fill="#000000" fill-rule="nonzero"/>
+            <path d="M 51 44.5 L 77 128.5 L 51 138.5 Z" id="Path-31" fill-opacity="0.15" fill="#000000" fill-rule="nonzero"/>
+            <path d="M 63 40 L 77 34 L 67 139 Z" id="Path-32" fill-opacity="0.15" fill="#000000" fill-rule="nonzero"/>
+            <path d="M 77 20.200000762939453 L 108 11 L 77 34.29999923706055 Z" id="Path-33" fill-opacity="0.15" fill="#000000" fill-rule="nonzero"/>
+            <path d="M 98.5 11 L 108 21.5 L 108 11 Z" id="Path-34" fill-opacity="0.1" fill="#000000" fill-rule="nonzero"/>
+            <path d="M 92.30000305175781 48.400001525878906 L 88 64 L 112 48 Z" id="Path-30" fill-opacity="0.15" fill="#000000" fill-rule="nonzero"/>
+            <path d="M 121 62 L 90 64.5 L 101 47 Z" id="Path-35" fill-opacity="0.15" fill="#000000" fill-rule="nonzero"/>
+        </g></svg>

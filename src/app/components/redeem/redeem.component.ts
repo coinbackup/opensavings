@@ -158,6 +158,7 @@ export class RedeemComponent implements OnInit {
     private showErrorModal( error: AppError ) {
         this.dialog.open( BasicDialog, { data: {
             title: 'Error',
+            icon: './assets/img/icons/x.svg',
             body: error.message
         }});
     }

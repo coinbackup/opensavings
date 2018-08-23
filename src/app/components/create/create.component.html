@@ -1,35 +1,42 @@
-<h1>
-    Create a time-locked address
-</h1>
+<section>
+    <h1 class="has-image">
+        <img src="./assets/img/icons/mailbox.svg">
+        Create a time-locked address
+    </h1>
 
-<form>
-    <mat-form-field class="whole" appearance="fill">
-        <mat-label>Blockchain</mat-label>
-        <mat-select placeholder="Blockchain" [(ngModel)]="selectedBlockchain" name="blockchain">
-            <mat-option *ngFor="let chain of blockchains" [value]="chain">
-                {{chain.longName}}
-            </mat-option>
-        </mat-select>
-    </mat-form-field>
+    <form>
+        <mat-form-field class="whole" appearance="fill">
+            <mat-label>Blockchain</mat-label>
+            <mat-select placeholder="Blockchain" [(ngModel)]="selectedBlockchain" name="blockchain">
+                <mat-option *ngFor="let chain of blockchains" [value]="chain">
+                    {{chain.longName}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
 
-    <mat-form-field class="half" appearance="fill">
-        <mat-label>Unlock date</mat-label>
-        <input matInput [matDatepicker]="dp" [(ngModel)]="lockDate" name="date">
-        <mat-datepicker #dp></mat-datepicker>
-    </mat-form-field>
-    <div></div>
-    <mat-form-field class="half" appearance="fill">
-        <mat-label>Unlock time</mat-label>
-        <input type="time" matInput [(ngModel)]="lockTime" name="time">
-    </mat-form-field>
-</form>
+        <mat-form-field class="half" appearance="fill">
+            <mat-label>Unlock date</mat-label>
+            <input matInput [matDatepicker]="dp" [(ngModel)]="lockDate" name="date">
+            <mat-datepicker #dp></mat-datepicker>
+        </mat-form-field>
+        <div></div>
+        <mat-form-field class="half" appearance="fill">
+            <mat-label>Unlock time</mat-label>
+            <input type="time" matInput [(ngModel)]="lockTime" name="time">
+        </mat-form-field>
+    </form>
 
-<div class="action-button-container">
-    <button mat-raised-button color="primary" (click)="createTimeLockedAddress( lockDate, lockTime )">Create address</button>
-</div>
+    <div class="action-button-container">
+        <button mat-raised-button color="primary" (click)="createTimeLockedAddress( lockDate, lockTime )">Create address</button>
+    </div>
+</section>
 
-<div *ngIf="addressInfo">
-    <h2>Time-locked address created</h2>
+<section *ngIf="addressInfo">
+    <h1 class="has-image">
+        <img src="./assets/img/icons/check.svg">
+        Success!
+    </h1>
+
     <button mat-raised-button color="primary" (click)="print('time-lock-print')">Print everything</button>
     <p>Send coins to the address below to time-lock them. The coins will be locked until <b>{{addressInfo.lockTime.toLocaleString()}}.</b></p>
     <div class="lock-address-info">
@@ -60,4 +67,4 @@
             <img src="{{addressInfo.redeemQRData}}">
         </p>
     </div>
-</div>
+</section>

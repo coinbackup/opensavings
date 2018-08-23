@@ -75,6 +75,7 @@ export class CheckBalanceComponent implements OnInit {
         if ( typeof e === 'string' ) e = new Error( e );
         this.dialog.open( BasicDialog, { data: {
             title: 'Error',
+            icon: './assets/img/icons/x.svg',
             body: e.message
         }});
     }

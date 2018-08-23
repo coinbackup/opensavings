@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg id="master-artboard" viewBox="0 0 154 158" version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" style="enable-background:new 0 0 336 235.2;" width="154px" height="158px"><rect id="ee-background" x="0" y="0" width="154" height="158" style="fill: white; fill-opacity: 0; pointer-events: none;"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<title>mdpi/icons</title><g id="Group-4" transform="matrix(1.1748406887054443, 0.6782945394515991, -0.6782945394515991, 1.1748406887054443, 78.89620366425845, -23.01959892307366)" fill-rule="nonzero">
+            <g id="Group-3" transform="translate(0.017573, 0.081716)" fill="#56D51F">
+                <path d="M 0 92.698349 H 61.785442 V 115.872936 H 0 V 92.698349 Z" id="Rectangle-4"/>
+                <path d="M 38.610859 0 H 61.785446 V 113.766151 H 38.610859 V 0 Z" id="Rectangle-4" transform="translate(50.198150, 56.883076) scale(1, -1) translate(-50.198150, -56.883076) "/>
+            </g>
+            <path d="M 0.08377225697040558 92.74629974365234 L 61.85879135131836 116.04740142822266 L 0.08377225697040558 116.04740142822266 Z" id="Path-2" fill-opacity="0.2" fill="#000000"/>
+            <path d="M 61.85879135131836 116.04740142822266 L 38.55768585205078 92.74629974365234 L 61.85879135131836 0.08377225697040558 Z" id="Path-3" fill-opacity="0.2" fill="#000000"/>
+            <path d="M 38.55768585205078 0.08377225697040558 L 61.85879135131836 116.04740142822266 L 38.55768585205078 116.04740142822266 Z" id="Path-4" fill-opacity="0.15" fill="#000000"/>
+        </g></svg>

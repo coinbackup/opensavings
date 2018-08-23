@@ -1,4 +1,7 @@
-<h1 mat-dialog-title>{{data.title}}</h1>
+<h1 mat-dialog-title [class.has-image]="data.icon">
+    <img *ngIf="data.icon" src="{{data.icon}}">
+    {{data.title}}
+</h1>
 <div mat-dialog-content>
     {{data.body}}
 </div>
