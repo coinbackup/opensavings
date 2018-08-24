@@ -156,8 +156,12 @@ form {
 
 [hidden] { display: none !important }
 
-mat-form-field + .qr-scan-buttons {
+#below-field-button {
     margin: -1.4em 0 1.4em 0;
+}
+
+mat-form-field + .qr-scan-buttons {
+    @extend #below-field-button;
     .qr-input {
         position: relative;
         input {
@@ -171,6 +175,10 @@ mat-form-field + .qr-scan-buttons {
             cursor: pointer;
         }
     }
+}
+
+mat-form-field + .below-field-button {
+    @extend #below-field-button;
 }
 
 @media print {
@@ -243,4 +251,6 @@ mat-form-field + .qr-scan-buttons {
             padding-left: 2.3em;
         }
     }
+
+    form > *.half { flex-basis: 100% }
 }

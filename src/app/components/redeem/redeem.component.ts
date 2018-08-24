@@ -6,6 +6,7 @@ import { BlockchainService } from '../../services/blockchain/blockchain.service'
 import { TimeLockService } from '../../services/time-lock/time-lock.service';
 import { BlockchainType } from '../../models/blockchain-types';
 import { QrScannerComponent } from '../qr-scanner/qr-scanner.component';
+import { SmoothScroll } from '../../services/smooth-scroll/smooth-scroll.service';
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
 
@@ -24,7 +25,7 @@ export class RedeemComponent implements OnInit {
 
     private selectedBlockchain: BlockchainType;
 
-    constructor( private blockchainService: BlockchainService, private timeLockService: TimeLockService, private dialog: MatDialog ) {
+    constructor( private blockchainService: BlockchainService, private timeLockService: TimeLockService, private dialog: MatDialog, private smoothScroll: SmoothScroll ) {
         QrScannerComponent.onQrScanFailure = message => this.showErrorModal( new AppError(AppError.TYPES.OTHER, message) );
     }
 
@@ -41,6 +42,11 @@ export class RedeemComponent implements OnInit {
             
             this.redeemToAddress( data.version, data.blockchain, data.redeemScript, data.redeemKey, toAddress )
             .then( newTxId => this.newTxId = newTxId )
+            .then( () => {
+                setTimeout( () => {
+                    this.smoothScroll.to( document.getElementById('success') );
+                }, 1 );
+            })
             .catch( err => this.showErrorModal(err) )
             ['finally']( () => this.buttonDisabled = false );
 
@@ -51,7 +57,7 @@ export class RedeemComponent implements OnInit {
     }
     
 
-    // @@ Also I should put the scriptSig conditions on the cheque (what is added before redeemScript)
+    // Should I put the scriptSig conditions on the printed paper (what is added before redeemScript)?
     private redeemToAddress( version: number, blockchain: string, fromRedeemScript: string, redeemerPrivateKeyWIF: string, toAddress: string ) {
         // Do nothing with the version number yet. We'll use it if the code changes drastically
 
@@ -75,11 +81,7 @@ export class RedeemComponent implements OnInit {
         } catch( e ) {
             throw e;
         }
-        
     }
-
-
-    //QRCode.toDataURL( address.toString(), {width: 800} )
 
     private buildRedeemTx(
         redeemScript: Bitcore.Script|BitcoreCash.Script,
@@ -135,7 +137,7 @@ export class RedeemComponent implements OnInit {
                     // We can't verify this tx, because bitcore can't auto-verify nonstandard txs.
                     // Pass true to serialize() to skip all verification tests.
                     let serializedTx = tx.serialize( true );
-                    console.log( serializedTx );
+                    console.log( 'Serialized transaction: ' + serializedTx );
 
                     resolve( serializedTx );
                 } catch( e ) {

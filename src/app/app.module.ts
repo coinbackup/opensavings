@@ -17,6 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 // NG Translate
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -34,6 +35,7 @@ import { CheckBalanceComponent } from './components/check-balance/check-balance.
 import { RedeemComponent } from './components/redeem/redeem.component';
 import { HomeComponent } from './components/home/home.component';
 import { BasicDialog } from './dialogs/basic-dialog/basic-dialog.component';
+import { ImageDialog } from './dialogs/image-dialog/image-dialog.component';
 import { QrScannerComponent } from './components/qr-scanner/qr-scanner.component';
 
 // AoT requires an exported function for factories
@@ -47,7 +49,7 @@ export function HttpLoaderFactory(http: HttpClient) {
         HomeComponent,
         WebviewDirective,
         // Dialogs
-        BasicDialog,
+        BasicDialog, ImageDialog,
         IntroComponent,
         CreateComponent,
         CheckBalanceComponent,
@@ -56,7 +58,8 @@ export function HttpLoaderFactory(http: HttpClient) {
         QrScannerComponent
     ],
     entryComponents: [
-        BasicDialog
+        BasicDialog,
+        ImageDialog
     ],
     imports: [
         BrowserModule,
@@ -76,7 +79,8 @@ export function HttpLoaderFactory(http: HttpClient) {
         MatDialogModule,
         MatSidenavModule,
         MatListModule,
-        MatDatepickerModule
+        MatDatepickerModule,
+        MatSnackBarModule
     ],
     providers: [ElectronService],
     bootstrap: [AppComponent]

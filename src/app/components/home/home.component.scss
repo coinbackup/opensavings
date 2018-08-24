@@ -1,3 +1,8 @@
+.developer-button {
+    min-width: 0 !important;
+    padding: 0 0.5em !important;
+}
+
 .rotating-icon {
     transition: all 0.25s;
     &.upside-down { transform: rotate(-180deg) }

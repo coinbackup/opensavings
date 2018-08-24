@@ -18,31 +18,24 @@
     <mat-card>
         <h3><i class="material-icons">lock</i> Create a time-locked address</h3>
         <p>Any coins sent to a time-locked address will be unspendable until a future date.</p>
-        <a mat-button routerLink="/create">Create address <i class="material-icons">chevron_right</i></a>
+        <a mat-raised-button color="primary" routerLink="/create">Create address <i class="material-icons">chevron_right</i></a>
     </mat-card>
     <mat-card>
         <h3><i class="material-icons">account_balance_wallet</i> Check the balance of a time-locked address</h3>
         <p>See how many coins are stored in a time-locked address.</p>
-        <a mat-button routerLink="/check-balance">Check balance <i class="material-icons">chevron_right</i></a>
+        <a mat-raised-button color="primary" routerLink="/check-balance">Check balance <i class="material-icons">chevron_right</i></a>
     </mat-card>
     <mat-card>
         <h3><i class="material-icons">redeem</i> Redeem coins from a time-locked address</h3>
         <p>Transfer all coins from a time-locked address to your wallet.</p>
-        <a mat-button routerLink="/redeem">Redeem coins <i class="material-icons">chevron_right</i></a>
+        <a mat-raised-button color="primary" routerLink="/redeem">Redeem coins <i class="material-icons">chevron_right</i></a>
     </mat-card>
 
     <mat-card>
-        <button mat-button (click)="showDeveloper = !showDeveloper" class="wide-only">
-            I'm a developer. Tell me how this works.
+        <p>I'm a developer. Tell me how this works.</p>
+        <button mat-flat-button color="primary" (click)="showDeveloper = !showDeveloper" class="developer-button">
             <i class="material-icons rotating-icon" [class.upside-down]="showDeveloper">keyboard_arrow_down</i>
         </button>
-        <div class="narrow-only">
-            I'm a developer.<br>
-            <button mat-button (click)="showDeveloper = !showDeveloper">
-                Tell me how this works.
-                <i class="material-icons rotating-icon" [class.upside-down]="showDeveloper">keyboard_arrow_down</i>
-            </button>
-        </div>
 
         <div *ngIf="showDeveloper">
             <p>

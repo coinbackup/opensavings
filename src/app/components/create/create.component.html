@@ -31,28 +31,40 @@
     </div>
 </section>
 
-<section *ngIf="addressInfo">
+<section *ngIf="addressInfo" id="success">
     <h1 class="has-image">
         <img src="./assets/img/icons/check.svg">
         Success!
     </h1>
 
     <button mat-raised-button color="primary" (click)="print('time-lock-print')">Print everything</button>
-    <p>Send coins to the address below to time-lock them. The coins will be locked until <b>{{addressInfo.lockTime.toLocaleString()}}.</b></p>
-    <div class="lock-address-info">
-        <img src="{{addressInfo.addressQRData}}" alt="QR code">
-        <form>
-            <mat-form-field class="whole">
-                <input matInput [value]="addressInfo.p2shAddress" readonly (click)="$event.target.select()">
-            </mat-form-field>
-        </form>
-    </div>
+    <p>Before you lock any coins, either <b>copy or print all the information below</b> and keep it in a safe place.</p>
 
-    <p>Copy all the information below to a safe place, or print it. Whoever has this information can redeem the locked coins.</p>
     <form>
-        <mat-form-field class="whole">
-            <textarea matInput [matTextareaAutosize]="true" [value]="addressInfo.redeemJSON" readonly (click)="$event.target.select()"></textarea>
+        <mat-form-field appearance="fill" class="whole">
+            <mat-label>Unlock time</mat-label>
+            <input matInput readonly (click)="$event.target.select()" [value]="addressInfo.lockTime.toLocaleString()" #successUnlockTime>
         </mat-form-field>
+        <div class="below-field-button">
+            <button mat-button color="primary" (click)="copyToClipboard(successUnlockTime)">Copy to clipboard</button>
+        </div>
+
+        <mat-form-field appearance="fill" class="whole">
+            <mat-label>Send coins to this address to lock them</mat-label>
+            <input matInput readonly (click)="$event.target.select()" [value]="addressInfo.p2shAddress" #successAddress>
+        </mat-form-field>
+        <div class="below-field-button">
+            <button mat-button color="primary" (click)="copyToClipboard(successAddress)">Copy to clipboard</button>
+            <button mat-button color="primary" (click)="showImageDialog(addressInfo.addressQRData)">Show QR code</button>
+        </div>
+
+        <mat-form-field appearance="fill" class="whole">
+            <mat-label>Data needed to redeem coins &mdash; whoever has this data can redeem the coins!</mat-label>
+            <textarea matInput readonly (click)="$event.target.select()" [matTextareaAutosize]="true" [value]="addressInfo.redeemJSON" #successRedeem></textarea>
+        </mat-form-field>
+        <div class="below-field-button">
+            <button mat-button color="primary" (click)="copyToClipboard(successRedeem)">Copy to clipboard</button>
+        </div>
     </form>
 
     <div id="time-lock-print" class="hidden">

@@ -27,12 +27,13 @@
     </div>
 </section>
 
-<section *ngIf="balanceInfo.totalCoinsText && !buttonDisabled">
+<section *ngIf="balanceInfo.totalCoinsText && !buttonDisabled" id="success">
     <h1 class="has-image">
         <img src="./assets/img/icons/check.svg">
-        Balance of address
+        Success
     </h1>
     <div>
+        <h3>Balance of address</h3>
         <p><b>{{balanceInfo.totalCoinsText}}</b><br>({{balanceInfo.totalUSDText}})</p>
     </div>
 </section>

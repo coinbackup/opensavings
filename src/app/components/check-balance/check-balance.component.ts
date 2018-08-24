@@ -4,6 +4,7 @@ import { BasicDialog } from '../../dialogs/basic-dialog/basic-dialog.component';
 import { BlockchainService } from '../../services/blockchain/blockchain.service';
 import { BlockchainType } from '../../models/blockchain-types';
 import { QrScannerComponent } from '../qr-scanner/qr-scanner.component';
+import { SmoothScroll } from '../../services/smooth-scroll/smooth-scroll.service';
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
 
@@ -23,7 +24,7 @@ export class CheckBalanceComponent implements OnInit {
         totalUSDText: undefined
     };
 
-    constructor( private blockchainService: BlockchainService, private dialog: MatDialog ) {
+    constructor( private blockchainService: BlockchainService, private dialog: MatDialog, private smoothScroll:SmoothScroll ) {
         QrScannerComponent.onQrScanSuccess = decoded => this.lockedAddress = decoded;
         QrScannerComponent.onQrScanFailure = message => this.showError( message );
     }
@@ -61,6 +62,9 @@ export class CheckBalanceComponent implements OnInit {
             })
             .then( (USDPerCoin: number) => {
                 this.balanceInfo.totalUSDText = '$' + ( USDPerCoin * totalCoins ).toFixed( 2 );
+                setTimeout( () => {
+                    this.smoothScroll.to( document.getElementById('success') );
+                }, 1 );
             })
             .catch( err => this.showError(err) )
             ['finally']( () => this.buttonDisabled = false );

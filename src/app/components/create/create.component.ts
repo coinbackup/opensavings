@@ -1,11 +1,13 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { TimeLockService } from '../../services/time-lock/time-lock.service';
 import { BlockchainService } from '../../services/blockchain/blockchain.service';
 import { BlockchainType } from '../../models/blockchain-types';
 import { TimeLockTypes } from '../../models/time-lock-types';
 import { ConstantsService } from '../../services/constants/constants.service';
 import { BasicDialog } from '../../dialogs/basic-dialog/basic-dialog.component';
+import { ImageDialog } from '../../dialogs/image-dialog/image-dialog.component';
+import { SmoothScroll } from '../../services/smooth-scroll/smooth-scroll.service';
 import * as QRCode from 'qrcode';
 
 @Component({
@@ -38,7 +40,9 @@ export class CreateComponent implements OnInit {
     constructor( private _blockchainService: BlockchainService,
         private _timeLockService: TimeLockService,
         private _dialog: MatDialog,
-        private _constants: ConstantsService
+        private _snackBar: MatSnackBar,
+        private _constants: ConstantsService,
+        private _smoothScroll: SmoothScroll
     ) {
         // Initialize with current local date and time
         this.lockDate = new Date();
@@ -98,6 +102,9 @@ export class CreateComponent implements OnInit {
                     addressQRData: dataURLs[0],
                     redeemQRData: dataURLs[1]
                 };
+                setTimeout( () => {
+                    this._smoothScroll.to( document.getElementById('success') );
+                }, 1 );
             })
             .catch( e => this.showError(e) );
 
@@ -156,6 +163,16 @@ export class CreateComponent implements OnInit {
             icon: './assets/img/icons/x.svg',
             body: e.message
         }});
+    }
+
+    public showImageDialog( imgSrc: string ) {
+        this._dialog.open( ImageDialog, { data: imgSrc } );
+    }
+
+    public copyToClipboard( target ) {
+        target.select();
+        document.execCommand( 'copy' );
+        this._snackBar.open( 'Copied to clipboard.', '', {duration:1500} );
     }
 
     ngOnInit() {
