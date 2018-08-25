@@ -178,7 +178,7 @@ export class QrScannerComponent implements OnInit {
         }
     }
     
-    private stopWebcam( cb?: Function ) {
+    public stopWebcam( cb?: Function ) {
         if ( this.webcamIsOn ) {
             this.stopWebcamFlag = true;
             this.stopWebcamCallback = cb;
