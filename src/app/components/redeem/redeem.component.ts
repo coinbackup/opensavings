@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { BasicDialog } from '../../dialogs/basic-dialog/basic-dialog.component';
+import { ConfirmDialog } from '../../dialogs/confirm-dialog/confirm-dialog.component';
 import { AppError } from '../../models/error-types';
 import { BlockchainService } from '../../services/blockchain/blockchain.service';
 import { TimeLockService } from '../../services/time-lock/time-lock.service';
@@ -20,7 +21,7 @@ export class RedeemComponent implements OnInit {
     redeemJSON: string;
     destinationAddress: string;
     buttonDisabled: boolean = false;
-    newTxId: string;
+    newTxId;
     qrScanner = QrScannerComponent.instance;
 
     private selectedBlockchain: BlockchainType;
@@ -77,7 +78,20 @@ export class RedeemComponent implements OnInit {
             
             return this.blockchainService.getUTXOs( p2shAddress )
             .then( (utxos:any[]) => this.buildRedeemTx(redeemScript, privateKey, toAddress, utxos) )
-            .then( serializedTx => this.blockchainService.broadcastTx(serializedTx) );
+            .then( serializedTx => {
+                return new Promise( (resolve,reject) => {
+                    let dialogRef = this.dialog.open( ConfirmDialog, { data: 'Do you wish to @@blabla?' } );
+                    dialogRef.afterClosed().subscribe( result => {
+                        if ( result ) {
+                            // confirmed.
+                            this.blockchainService.broadcastTx( serializedTx ).then( () => resolve() );
+                        } else {
+                            // cancelled.
+                            resolve();
+                        }
+                    });
+                });
+            });
         } catch( e ) {
             throw e;
         }

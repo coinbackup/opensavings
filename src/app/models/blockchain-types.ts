@@ -76,10 +76,10 @@ export class BlockchainType {
     );
 
     public static readonly allTypes: BlockchainType[] = [
-        BlockchainType.BTC,
         BlockchainType.BCH,
-        BlockchainType.tBTC,
-        BlockchainType.tBCH
+        BlockchainType.BTC,
+        BlockchainType.tBCH,
+        BlockchainType.tBTC
     ];
 
 

@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
+import { MediaMatcher } from '@angular/cdk/layout';
 import { Router } from '@angular/router';
 import { ElectronService } from './providers/electron.service';
 import { TranslateService } from '@ngx-translate/core';
 import { AppConfig } from '../environments/environment';
+import { SmoothScroll } from './services/smooth-scroll/smooth-scroll.service';
 
 @Component({
     selector: 'app-root',
@@ -29,9 +31,18 @@ export class AppComponent {
         }
     ];
 
-    constructor(public electronService: ElectronService,
+    mobileQuery: MediaQueryList;
+
+    private _mobileQueryListener: () => void;
+
+    constructor(
+        public electronService: ElectronService,
         public router: Router,
-        private translate: TranslateService) {
+        private translate: TranslateService,
+        private changeDetectorRef: ChangeDetectorRef,
+        private media: MediaMatcher,
+        private smoothScroll: SmoothScroll
+    ) {
 
         translate.setDefaultLang('en');
         console.log('AppConfig', AppConfig);
@@ -43,5 +54,11 @@ export class AppComponent {
         } else {
             console.log('Mode web');
         }
+
+        // watch for changes in browser width
+        this.mobileQuery = media.matchMedia( '(max-width: 600px)' );
+        this._mobileQueryListener = () => changeDetectorRef.detectChanges();
+        this.mobileQuery.addListener( this._mobileQueryListener );
+        smoothScroll.mobileQuery = this.mobileQuery;
     }
 }

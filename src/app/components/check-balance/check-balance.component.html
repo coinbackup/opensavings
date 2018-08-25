@@ -1,4 +1,4 @@
-<section>
+<mat-card>
     <h1 class="has-image">
         <img src="./assets/img/icons/balance.svg">
         Check the balance of a time-locked address
@@ -25,9 +25,9 @@
             Check balance <span *ngIf="buttonDisabled"><mat-spinner diameter="20"></mat-spinner></span>
         </button>
     </div>
-</section>
+</mat-card>
 
-<section *ngIf="balanceInfo.totalCoinsText && !buttonDisabled" id="success">
+<mat-card *ngIf="balanceInfo.totalCoinsText && !buttonDisabled" id="success">
     <h1 class="has-image">
         <img src="./assets/img/icons/check.svg">
         Success
@@ -36,4 +36,4 @@
         <h3>Balance of address</h3>
         <p><b>{{balanceInfo.totalCoinsText}}</b><br>({{balanceInfo.totalUSDText}})</p>
     </div>
-</section>
+</mat-card>

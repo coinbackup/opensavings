@@ -11,7 +11,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 // NG material
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatCardModule, MatButtonModule, MatProgressSpinnerModule, MatInputModule, MatNativeDateModule } from '@angular/material';
+import { MatCardModule, MatButtonModule, MatProgressSpinnerModule, MatInputModule, MatNativeDateModule, MatIconModule, MatToolbarModule } from '@angular/material';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -34,9 +34,11 @@ import { CreateComponent } from './components/create/create.component';
 import { CheckBalanceComponent } from './components/check-balance/check-balance.component';
 import { RedeemComponent } from './components/redeem/redeem.component';
 import { HomeComponent } from './components/home/home.component';
+import { QrScannerComponent } from './components/qr-scanner/qr-scanner.component';
+
 import { BasicDialog } from './dialogs/basic-dialog/basic-dialog.component';
 import { ImageDialog } from './dialogs/image-dialog/image-dialog.component';
-import { QrScannerComponent } from './components/qr-scanner/qr-scanner.component';
+import { ConfirmDialog } from './dialogs/confirm-dialog/confirm-dialog.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -49,17 +51,17 @@ export function HttpLoaderFactory(http: HttpClient) {
         HomeComponent,
         WebviewDirective,
         // Dialogs
-        BasicDialog, ImageDialog,
+        BasicDialog, ImageDialog, ConfirmDialog,
         IntroComponent,
         CreateComponent,
         CheckBalanceComponent,
         RedeemComponent,
-        BasicDialog,
         QrScannerComponent
     ],
     entryComponents: [
         BasicDialog,
-        ImageDialog
+        ImageDialog,
+        ConfirmDialog
     ],
     imports: [
         BrowserModule,
@@ -74,7 +76,7 @@ export function HttpLoaderFactory(http: HttpClient) {
                 deps: [HttpClient]
             }
         }),
-        MatCardModule, MatButtonModule, MatProgressSpinnerModule, MatInputModule, MatNativeDateModule,
+        MatCardModule, MatButtonModule, MatProgressSpinnerModule, MatInputModule, MatNativeDateModule, MatIconModule, MatToolbarModule,
         MatSelectModule,
         MatDialogModule,
         MatSidenavModule,

@@ -1,4 +1,4 @@
-<section>
+<mat-card>
     <h1 class="has-image">
         <img src="./assets/img/icons/coins.svg">
         Redeem coins from a time-locked address
@@ -20,7 +20,7 @@
         </div>
 
         <mat-form-field class="whole" appearance="fill">
-            <mat-label>Address to send the locked coins to</mat-label>
+            <mat-label>Your wallet's address</mat-label>
             <input matInput [(ngModel)]="destinationAddress" name="destinationAddress">
         </mat-form-field>
         <div class="qr-scan-buttons">
@@ -39,13 +39,13 @@
             Redeem coins <span *ngIf="buttonDisabled"><mat-spinner diameter="20"></mat-spinner></span>
         </button>
     </div>
-</section>
+</mat-card>
 
-<section *ngIf="newTxId && !buttonDisabled" id="success">
+<mat-card *ngIf="newTxId && !buttonDisabled" id="success">
     <h1 class="has-image">
         <img src="./assets/img/icons/check.svg">
         Success!
     </h1>
     <p><b>Transaction ID:</b> {{newTxId}}</p>
     <p><a [href]="selectedBlockchain.getTxExplorerLink(newTxId)" target="_blank">View on blockchain</a></p>
-</section>
+</mat-card>

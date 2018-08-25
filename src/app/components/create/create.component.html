@@ -1,4 +1,4 @@
-<section>
+<mat-card>
     <h1 class="has-image">
         <img src="./assets/img/icons/mailbox.svg">
         Create a time-locked address
@@ -15,13 +15,13 @@
         </mat-form-field>
 
         <mat-form-field class="half" appearance="fill">
-            <mat-label>Unlock date</mat-label>
+            <mat-label>Locked until (date)</mat-label>
             <input matInput [matDatepicker]="dp" [(ngModel)]="lockDate" name="date">
             <mat-datepicker #dp></mat-datepicker>
         </mat-form-field>
-        <div></div>
+        <div style="flex:0 1 1em"></div>
         <mat-form-field class="half" appearance="fill">
-            <mat-label>Unlock time</mat-label>
+            <mat-label>Locked until (time)</mat-label>
             <input type="time" matInput [(ngModel)]="lockTime" name="time">
         </mat-form-field>
     </form>
@@ -29,9 +29,9 @@
     <div class="action-button-container">
         <button mat-raised-button color="primary" (click)="createTimeLockedAddress( lockDate, lockTime )">Create address</button>
     </div>
-</section>
+</mat-card>
 
-<section *ngIf="addressInfo" id="success">
+<mat-card *ngIf="addressInfo" id="success">
     <h1 class="has-image">
         <img src="./assets/img/icons/check.svg">
         Success!
@@ -42,14 +42,6 @@
 
     <form>
         <mat-form-field appearance="fill" class="whole">
-            <mat-label>Unlock time</mat-label>
-            <input matInput readonly (click)="$event.target.select()" [value]="addressInfo.lockTime.toLocaleString()" #successUnlockTime>
-        </mat-form-field>
-        <div class="below-field-button">
-            <button mat-button color="primary" (click)="copyToClipboard(successUnlockTime)">Copy to clipboard</button>
-        </div>
-
-        <mat-form-field appearance="fill" class="whole">
             <mat-label>Send coins to this address to lock them</mat-label>
             <input matInput readonly (click)="$event.target.select()" [value]="addressInfo.p2shAddress" #successAddress>
         </mat-form-field>
@@ -59,7 +51,17 @@
         </div>
 
         <mat-form-field appearance="fill" class="whole">
-            <mat-label>Data needed to redeem coins &mdash; whoever has this data can redeem the coins!</mat-label>
+            <mat-label>Locked until</mat-label>
+            <input matInput readonly (click)="$event.target.select()" [value]="addressInfo.lockTime.toLocaleString()" #successUnlockTime>
+        </mat-form-field>
+        <div class="below-field-button">
+            <button mat-button color="primary" (click)="copyToClipboard(successUnlockTime)">Copy to clipboard</button>
+        </div>
+    </form>
+    <p>Store the data below with care &mdash; whoever has it can redeem the locked coins after the lock expires!</p>
+    <form>
+        <mat-form-field appearance="fill" class="whole">
+            <mat-label>Data needed to redeem coins from the time-locked address</mat-label>
             <textarea matInput readonly (click)="$event.target.select()" [matTextareaAutosize]="true" [value]="addressInfo.redeemJSON" #successRedeem></textarea>
         </mat-form-field>
         <div class="below-field-button">
@@ -79,4 +81,4 @@
             <img src="{{addressInfo.redeemQRData}}">
         </p>
     </div>
-</section>
+</mat-card>

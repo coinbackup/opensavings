@@ -50,7 +50,7 @@ export class CreateComponent implements OnInit {
 
         // Init blockchain select
         this.blockchains = BlockchainType.allTypes;
-        this.selectedBlockchain = BlockchainType.BTC;
+        this.selectedBlockchain = BlockchainType.BCH;
 
         // Set default blockchain and lockscript type
         this._timeLockService.setTimeLockType( TimeLockTypes.PKH );
