@@ -1,5 +1,13 @@
 <div mat-dialog-content>
-    <p>{{message}}</p>
+    <h3>Redeem the coins?</h3>
+    <dl>
+        <dt>Total:</dt>
+        <dd><code>{{txDetails.total}} {{txDetails.units}} (minus fee)</code></dd>
+        <dt>Fee:</dt>
+        <dd><code>{{txDetails.fee}} {{txDetails.units}}</code></dd>
+        <dt>Redeem to:</dt>
+        <dd><code>{{txDetails.toAddress}}</code></dd>
+    </dl>
 </div>
 <div mat-dialog-actions>
     <button mat-button color="primary" [mat-dialog-close]="false">Cancel</button>

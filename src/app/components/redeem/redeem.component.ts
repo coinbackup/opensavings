@@ -42,8 +42,8 @@ export class RedeemComponent implements OnInit {
             });
             
             this.redeemToAddress( data.version, data.blockchain, data.redeemScript, data.redeemKey, toAddress )
-            .then( newTxId => this.newTxId = newTxId )
-            .then( () => {
+            .then( newTxId => {
+                this.newTxId = newTxId;
                 setTimeout( () => {
                     this.smoothScroll.to( document.getElementById('success') );
                 }, 1 );
@@ -78,13 +78,16 @@ export class RedeemComponent implements OnInit {
             
             return this.blockchainService.getUTXOs( p2shAddress )
             .then( (utxos:any[]) => this.buildRedeemTx(redeemScript, privateKey, toAddress, utxos) )
-            .then( serializedTx => {
+            .then( txDetails => {
                 return new Promise( (resolve,reject) => {
-                    let dialogRef = this.dialog.open( ConfirmDialog, { data: 'Do you wish to @@blabla?' } );
+                    txDetails.units = chain.shortName;
+                    let dialogRef = this.dialog.open( ConfirmDialog, { data: txDetails } );
                     dialogRef.afterClosed().subscribe( result => {
                         if ( result ) {
                             // confirmed.
-                            this.blockchainService.broadcastTx( serializedTx ).then( () => resolve() );
+                            this.blockchainService.broadcastTx( txDetails.serializedTx )
+                            .then( newTxId => resolve(newTxId) )
+                            .catch( e => reject( e ) );
                         } else {
                             // cancelled.
                             resolve();
@@ -102,7 +105,7 @@ export class RedeemComponent implements OnInit {
         redeemerPrivateKey: Bitcore.PrivateKey|BitcoreCash.PrivateKey,
         toAddress: string,
         utxos: any[]
-    ): Bitcore.Transaction|BitcoreCash.Transaction {
+    ): any {
 
         let bitcoreLib = this.selectedBlockchain.bitcoreLib;
 
@@ -153,7 +156,13 @@ export class RedeemComponent implements OnInit {
                     let serializedTx = tx.serialize( true );
                     console.log( 'Serialized transaction: ' + serializedTx );
 
-                    resolve( serializedTx );
+                    // resolve with all the details of the transaction
+                    resolve({
+                        toAddress: toAddress,
+                        total: bitcoreLib.Unit.fromSatoshis( totalSatoshis ).toBTC(),
+                        fee: bitcoreLib.Unit.fromSatoshis( fee ).toBTC(),
+                        serializedTx: serializedTx
+                    });
                 } catch( e ) {
                     reject( new AppError(AppError.TYPES.OTHER, 'Unexpected error building a transaction: ' + e.message) );
                 }

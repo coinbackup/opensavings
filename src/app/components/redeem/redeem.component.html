@@ -46,6 +46,8 @@
         <img src="./assets/img/icons/check.svg">
         Success!
     </h1>
-    <p><b>Transaction ID:</b> {{newTxId}}</p>
+    <p id="tx-id">
+        <b>Transaction ID:</b> {{newTxId}}
+    </p>
     <p><a [href]="selectedBlockchain.getTxExplorerLink(newTxId)" target="_blank">View on blockchain</a></p>
 </mat-card>
