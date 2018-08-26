@@ -64,7 +64,7 @@ export class CheckBalanceComponent implements OnInit {
                 this.balanceInfo.totalUSDText = '$' + ( USDPerCoin * totalCoins ).toFixed( 2 );
                 setTimeout( () => {
                     this.smoothScroll.to( document.getElementById('success') );
-                }, 1 );
+                }, 100 );
             })
             .catch( err => this.showError(err) )
             ['finally']( () => this.buttonDisabled = false );

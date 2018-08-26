@@ -27,7 +27,9 @@
     </form>
 
     <div class="action-button-container">
-        <button mat-raised-button color="primary" (click)="createTimeLockedAddress( lockDate, lockTime )">Create address</button>
+        <button mat-raised-button color="primary" (click)="createTimeLockedAddress( lockDate, lockTime )" [disabled]="buttonDisabled">
+            Create address <span *ngIf="buttonDisabled"><mat-spinner diameter="20"></mat-spinner></span>
+        </button>
     </div>
 </mat-card>
 

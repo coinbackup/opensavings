@@ -46,7 +46,7 @@ export class RedeemComponent implements OnInit {
                 this.newTxId = newTxId;
                 setTimeout( () => {
                     this.smoothScroll.to( document.getElementById('success') );
-                }, 1 );
+                }, 100 );
             })
             .catch( err => this.showErrorModal(err) )
             ['finally']( () => this.buttonDisabled = false );

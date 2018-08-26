@@ -20,6 +20,7 @@ export class CreateComponent implements OnInit {
     public lockDate: Date;
     public lockTime: string;
     public blockchains: BlockchainType[];
+    buttonDisabled: boolean = false;
 
     public addressInfo: any = false;
     public redeemData: any;
@@ -58,59 +59,65 @@ export class CreateComponent implements OnInit {
 
 
     public createTimeLockedAddress( lockDate: Date, lockTime: string ) {
+        this.buttonDisabled = true;
         
-        try {
-            if ( lockDate === null ) throw 'Invalid date.';
-            if ( lockTime === '' ) throw 'Invalid time.';
-            if ( this.lockDate < this.minLockDate ) throw 'Date must be after ' + this.minLockDate.toDateString();
-            if ( this.lockDate > this.maxLockDate ) throw 'Date must be before ' + this.maxLockDate.toDateString();
-            
-            // Apply the time to the date
-            let submitDate = new Date( lockDate.getTime() );
-            let time = lockTime.split( ':' );
-            submitDate.setHours( parseInt(time[0]) );
-            submitDate.setMinutes( parseInt(time[1]) );
-            if ( isNaN(submitDate.getTime()) ) throw 'Invalid date.';
+        // pause to let the UI update with the spinner
+        setTimeout( () => {
+            try {
+                if ( lockDate === null ) throw 'Invalid date.';
+                if ( lockTime === '' ) throw 'Invalid time.';
+                if ( this.lockDate < this.minLockDate ) throw 'Date must be after ' + this.minLockDate.toDateString();
+                if ( this.lockDate > this.maxLockDate ) throw 'Date must be before ' + this.maxLockDate.toDateString();
+                
+                // Apply the time to the date
+                let submitDate = new Date( lockDate.getTime() );
+                let time = lockTime.split( ':' );
+                submitDate.setHours( parseInt(time[0]) );
+                submitDate.setMinutes( parseInt(time[1]) );
+                if ( isNaN(submitDate.getTime()) ) throw 'Invalid date.';
 
-            // Convert to seconds, UTC time
-            let lockTimeSeconds = Math.round( submitDate.getTime() / 1000 );
+                // Convert to seconds, UTC time
+                let lockTimeSeconds = Math.round( submitDate.getTime() / 1000 );
 
-            // Generate P2SH CLTV redeemScript and address, spendable by a newly generated private key
-            let bitcoreLib = this._blockchainService.getBlockchainType().bitcoreLib;
-            let privateKey = new bitcoreLib.PrivateKey();
-            let redeemScript = this._timeLockService.buildRedeemScript( lockTimeSeconds, privateKey );
+                // Generate P2SH CLTV redeemScript and address, spendable by a newly generated private key
+                let bitcoreLib = this._blockchainService.getBlockchainType().bitcoreLib;
+                let privateKey = new bitcoreLib.PrivateKey();
+                let redeemScript = this._timeLockService.buildRedeemScript( lockTimeSeconds, privateKey );
 
-            this.redeemData = {
-                version: this._constants.version,
-                blockchain: this.selectedBlockchain.shortName,
-                redeemKey: privateKey.toWIF(),
-                redeemScript: redeemScript.toString(),
-            };
-
-            let p2shAddress = bitcoreLib.Address.payingTo( redeemScript ).toString();
-
-            // create QR code
-            Promise.all([
-                QRCode.toDataURL( p2shAddress, {scale:28} ),
-                QRCode.toDataURL( JSON.stringify(this.redeemData), {scale:28} )
-            ])
-            .then( dataURLs => {
-                this.addressInfo = {
-                    lockTime: new Date( lockTimeSeconds * 1000 ),
-                    p2shAddress: p2shAddress,
-                    redeemJSON: JSON.stringify( this.redeemData ),
-                    addressQRData: dataURLs[0],
-                    redeemQRData: dataURLs[1]
+                this.redeemData = {
+                    version: this._constants.version,
+                    blockchain: this.selectedBlockchain.shortName,
+                    redeemKey: privateKey.toWIF(),
+                    redeemScript: redeemScript.toString(),
                 };
-                setTimeout( () => {
-                    this._smoothScroll.to( document.getElementById('success') );
-                }, 1 );
-            })
-            .catch( e => this.showError(e) );
 
-        } catch( error ) {
-            this.showError( error );
-        }
+                let p2shAddress = bitcoreLib.Address.payingTo( redeemScript ).toString();
+
+                // create QR code
+                Promise.all([
+                    QRCode.toDataURL( p2shAddress, {scale:28} ),
+                    QRCode.toDataURL( JSON.stringify(this.redeemData), {scale:28} )
+                ])
+                .then( dataURLs => {
+                    this.addressInfo = {
+                        lockTime: new Date( lockTimeSeconds * 1000 ),
+                        p2shAddress: p2shAddress,
+                        redeemJSON: JSON.stringify( this.redeemData ),
+                        addressQRData: dataURLs[0],
+                        redeemQRData: dataURLs[1]
+                    };
+                    setTimeout( () => {
+                        this._smoothScroll.to( document.getElementById('success') );
+                    }, 100 );
+                })
+                .catch( e => this.showError(e) )
+                ['finally']( () => this.buttonDisabled = false );
+
+            } catch( error ) {
+                this.showError( error );
+                this.buttonDisabled = false;
+            }
+        }, 200 );
     }
 
     // print a single DOM element.
