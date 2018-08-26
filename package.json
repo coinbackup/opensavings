@@ -1,10 +1,10 @@
 {
-  "name": "coincheque",
+  "name": "open-savings-initiative",
   "version": "1.0.0",
   "description": "Lock coins until a future date.",
-  "homepage": "https://github.com/coinbackup/coincheque",
+  "homepage": "https://github.com/coinbackup/opensavings",
   "author": {
-    "name": "prestigeit.io"
+    "name": "Ransom Christofferson"
   },
   "license": "MIT",
   "keywords": [
@@ -12,7 +12,8 @@
     "savings",
     "check",
     "cheque",
-    "nlocktime"
+    "nlocktime",
+    "checklocktimeverify"
   ],
   "main": "main.js",
   "private": true,
