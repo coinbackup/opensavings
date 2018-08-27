@@ -1,5 +1,7 @@
 ![Open Savings Initiative](./osi-logo.png)
 
+[https://opensavings.network](https://opensavings.network)
+
 # Introduction
 
 Open Savings Initiative lets you set aside cryptocurrency that can only be spent after a certain date. It's like a certificate of deposit that you can add more money to anytime, but doesn't require a bank.
@@ -12,9 +14,9 @@ The Open Savings Initiative app is built with Typescript, Anuglar, and Electron,
 
 ## Acknowledgements
 
-This app was developed by [Ransom Christofferson](http://ransomchristofferson.com/) and the [Prestige IT](https://prestigeit.io/) team, with guidance from [Yeoman's Capital](https://www.yeomans.capital/).
+This app was developed by [Ransom Christofferson](http://ransomchristofferson.com/) and the [Prestige IT](https://prestigeit.io/) team with guidance from [Yeoman's Capital](https://www.yeomans.capital/), and was funded by a generous donation from [Ricardo Jimenezh](https://www.linkedin.com/in/ricardojimenezh/).
 
-The project was bootstrapped from [maximegris/angular-electron](https://github.com/maximegris/angular-electron).
+Development was bootstrapped from [maximegris/angular-electron](https://github.com/maximegris/angular-electron).
 
 The Open Savings Initiative logo was built from [two](https://www.iconfinder.com/icons/1175307/piggy_piggycoin_icon) [icons](https://www.iconfinder.com/icons/1175251/bitcoin_btc_cryptocurrency_icon) created by AllienWorks, licenced under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
 
@@ -70,7 +72,7 @@ npm install
 |--|--|
 |`npm start`| Run the app in electron |
 |`npm run ng:serve:web`| Run the app in the browser with hot reload (native libraries don't work in this mode) |
-|`npm run build:prod:web`| Build the app with Angular aot, packaged for deployment as a website. |
+|`npm run build:prod:web`| Build the app with Angular aot, packaged for deployment as a website. The files will be in `dist`. |
 |`npm run electron:linux`| Builds the app as a native linux application |
 |`npm run electron:windows`| On Windows, builds the app as a native Windows application |
 |`npm run electron:mac`| On Mac OS, builds the app as a native Mac application |
