@@ -1,5 +1,5 @@
 {
-  "productName": "angular-electron",
+  "productName": "open-savings-initiative",
   "directories": {
     "output": "app-builds"
   },
@@ -22,7 +22,7 @@
   "win": {
     "icon": "dist",
     "target": [
-      "portable"
+      "portable:ia32", "portable:x64"
     ]
   },
   "mac": {

@@ -12,11 +12,8 @@ import { SmoothScroll } from './services/smooth-scroll/smooth-scroll.service';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-    public readonly navItems = [
-        /*{
-            link: '/intro',
-            label: 'Intro'
-        },*/ {
+    public navItems = [
+        {
             link: '/home',
             label: 'Home'
         }, {
@@ -53,6 +50,11 @@ export class AppComponent {
             console.log('NodeJS childProcess', electronService.childProcess);
         } else {
             console.log('Mode web');
+            // add download page
+            this.navItems.splice( 1, 0, {
+                link: '/download',
+                label: 'Download'
+            });
         }
 
         // watch for changes in browser width

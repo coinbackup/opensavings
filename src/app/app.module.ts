@@ -29,7 +29,7 @@ import { WebviewDirective } from './directives/webview.directive';
 
 
 import { AppComponent } from './app.component';
-import { IntroComponent } from './components/intro/intro.component';
+import { DownloadComponent } from './components/download/download.component';
 import { CreateComponent } from './components/create/create.component';
 import { CheckBalanceComponent } from './components/check-balance/check-balance.component';
 import { RedeemComponent } from './components/redeem/redeem.component';
@@ -52,7 +52,7 @@ export function HttpLoaderFactory(http: HttpClient) {
         WebviewDirective,
         // Dialogs
         BasicDialog, ImageDialog, ConfirmDialog,
-        IntroComponent,
+        DownloadComponent,
         CreateComponent,
         CheckBalanceComponent,
         RedeemComponent,

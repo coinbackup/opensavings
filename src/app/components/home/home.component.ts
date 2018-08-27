@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ElectronService } from '../../providers/electron.service';
 
 /**
  * This tool creates a P2SH address. Sending coins to the address will time-lock the coins.
@@ -26,10 +27,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-    addressQrData: string;
+    isElectron: boolean;
     showDeveloper: boolean = false;
 
-    constructor() {
+    constructor( public electronService: ElectronService ) {
+        this.isElectron = electronService.isElectron();
     }
 
     ngOnInit() {
