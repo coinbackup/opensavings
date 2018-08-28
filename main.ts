@@ -47,10 +47,8 @@ function createWindow() {
   let template = [{
     label: "Application",
     submenu: [
-      { label: "About Application", selector: "orderFrontStandardAboutPanel:" },
-      { type: "separator" },
-      { label: "Quit", accelerator: "Command+Q", click: () => app.quit() },
-      { label: "Open DevTools", click: () => win.webContents.openDevTools() }
+      { label: "Open DevTools", click: () => win.webContents.openDevTools() },
+      { label: "Quit", accelerator: "Command+Q", click: () => app.quit() }
     ]
   }, {
     label: "Edit",
