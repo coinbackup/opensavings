@@ -57,3 +57,13 @@ mat-sidenav-content {
 a.active {
     background: black;
 }
+
+.version {
+    position: absolute;
+    bottom: 0.2em;
+    left: 0.4em;
+    z-index: 10;
+    font-size: 60%;
+    color: white;
+    opacity: 0.1;
+}
