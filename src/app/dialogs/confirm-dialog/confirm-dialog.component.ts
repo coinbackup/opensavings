@@ -12,5 +12,8 @@ export class ConfirmDialog {
         public dialogRef: MatDialogRef<ConfirmDialog>,
         @Inject(MAT_DIALOG_DATA) public txDetails: any ) {}
     
-    
+    getUSDAmount( coins:number ): string {
+        let usd = ( coins * this.txDetails.USDPerCoin );
+        return usd < 0.01 ? 'less than $0.01 USD' : '$' + usd.toFixed(2) + ' USD';
+    }
 }

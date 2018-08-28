@@ -2,11 +2,15 @@ dt {
     opacity: 0.5;
 }
 
+h3 { margin-top: 0 }
+
 @media only screen and (max-width: 600px ) {
     dd {
         margin-left: 0;
         margin-bottom: 1em;
     }
-}
 
-h3 { margin-top: 0 }
+    .usd-amount {
+        display: block;
+    }
+}

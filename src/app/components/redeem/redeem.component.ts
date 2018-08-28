@@ -80,19 +80,22 @@ export class RedeemComponent implements OnInit {
             .then( (utxos:any[]) => this.buildRedeemTx(redeemScript, privateKey, toAddress, utxos) )
             .then( txDetails => {
                 return new Promise( (resolve,reject) => {
-                    txDetails.units = chain.shortName;
-                    let dialogRef = this.dialog.open( ConfirmDialog, { data: txDetails } );
-                    dialogRef.afterClosed().subscribe( result => {
-                        if ( result ) {
-                            // confirmed.
-                            this.blockchainService.broadcastTx( txDetails.serializedTx )
-                            .then( newTxId => resolve(newTxId) )
-                            .catch( e => reject( e ) );
-                        } else {
-                            // cancelled.
-                            resolve();
-                        }
-                    });
+                    this.blockchainService.getUSDRate().then( (USDPerCoin: number) => {
+                        txDetails.units = chain.shortName;
+                        txDetails.USDPerCoin = USDPerCoin;
+                        let dialogRef = this.dialog.open( ConfirmDialog, { data: txDetails } );
+                        dialogRef.afterClosed().subscribe( result => {
+                            if ( result ) {
+                                // confirmed.
+                                this.blockchainService.broadcastTx( txDetails.serializedTx )
+                                .then( newTxId => resolve(newTxId) )
+                                .catch( e => reject( e ) );
+                            } else {
+                                // cancelled.
+                                resolve();
+                            }
+                        });
+                    }).catch( e => reject(e) );
                 });
             });
         } catch( e ) {
@@ -159,7 +162,7 @@ export class RedeemComponent implements OnInit {
                     // resolve with all the details of the transaction
                     resolve({
                         toAddress: toAddress,
-                        total: bitcoreLib.Unit.fromSatoshis( totalSatoshis ).toBTC(),
+                        total: bitcoreLib.Unit.fromSatoshis( totalSatoshis - fee ).toBTC(),
                         fee: bitcoreLib.Unit.fromSatoshis( fee ).toBTC(),
                         serializedTx: serializedTx
                     });

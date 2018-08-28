@@ -2,9 +2,9 @@
     <h3>Redeem the coins?</h3>
     <dl>
         <dt>Total:</dt>
-        <dd><code>{{txDetails.total}} {{txDetails.units}} (minus fee)</code></dd>
+        <dd><code>{{txDetails.total}} {{txDetails.units}} <span class="usd-amount">({{getUSDAmount(txDetails.total)}})</span></code></dd>
         <dt>Fee:</dt>
-        <dd><code>{{txDetails.fee}} {{txDetails.units}}</code></dd>
+        <dd><code>{{txDetails.fee}} {{txDetails.units}} <span class="usd-amount">({{getUSDAmount(txDetails.fee)}})</span></code></dd>
         <dt>Redeem to:</dt>
         <dd><code>{{txDetails.toAddress}}</code></dd>
     </dl>

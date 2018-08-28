@@ -61,7 +61,8 @@ export class CheckBalanceComponent implements OnInit {
                 return this.blockchainService.getUSDRate()
             })
             .then( (USDPerCoin: number) => {
-                this.balanceInfo.totalUSDText = '$' + ( USDPerCoin * totalCoins ).toFixed( 2 );
+                let usd = USDPerCoin * totalCoins;
+                this.balanceInfo.totalUSDText = usd < 0.01 ? 'less than $0.01 USD' : '$' + usd.toFixed(2) + ' USD';
                 setTimeout( () => {
                     this.smoothScroll.to( document.getElementById('success') );
                 }, 100 );
