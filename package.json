@@ -26,7 +26,7 @@
     "build": "npm run postinstall:electron && npm run electron:tsc && ng build",
     "build:dev": "npm run build -- -c dev",
     "build:prod": "npm run build -- -c production",
-    "build:prod:web": "ng build -c production",
+    "build:prod:web": "npm run postinstall:web && ng build -c production",
     "ng:serve": "ng serve",
     "ng:serve:web": "npm run postinstall:web && ng serve -o",
     "electron:tsc": "tsc main.ts",
