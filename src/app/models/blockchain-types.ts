@@ -1,4 +1,4 @@
-import { IExplorer, InsightExplorer, BTCDotComExplorer, CoinMarketCapExplorer, ChainSoExplorer, BitcoinDotComExplorer } from './explorer-types';
+import { IExplorer, InsightExplorer, BTCDotComExplorer, CoinMarketCapExplorer, ChainSoExplorer, BitcoinDotComExplorer, BitcoinDotComPriceExplorer } from './explorer-types';
 import { BlockchainForks } from './blockchain-forks';
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
@@ -13,16 +13,13 @@ export class BlockchainType {
         Bitcore,
         Bitcore.Networks.livenet,
         Bitcore.crypto.Signature.SIGHASH_ALL,
-        ( txId ) => 'https://btc.blockdozer.com/tx/' + txId,
+        ( txId ) => 'https://blockchair.com/bitcoin/transaction/' + txId,
         [
             new InsightExplorer( 'https://insight.bitpay.com' ),
-            new InsightExplorer( 'https://btc.blockdozer.com' ),
-            new InsightExplorer( 'https://blockexplorer.com' ),
-            new InsightExplorer( 'https://insight.bitcoin.com' ),
-            new InsightExplorer( 'https://www.localbitcoinschain.com' ),
             new BTCDotComExplorer( 'https://chain.api.btc.com' ),
-            new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' ),
-            new ChainSoExplorer( 'https://chain.so' )
+            new CoinMarketCapExplorer( 'https://pro-api.coinmarketcap.com' ),
+            new ChainSoExplorer( 'https://chain.so' ),
+            new BitcoinDotComPriceExplorer( 'https://coin-api.bitcoin.com' )
         ]
     );
 
@@ -33,13 +30,11 @@ export class BlockchainType {
         Bitcore,
         Bitcore.Networks.testnet,
         Bitcore.crypto.Signature.SIGHASH_ALL,
-        ( txId ) => 'https://tbtc.blockdozer.com/tx/' + txId,
+        ( txId ) => 'https://live.blockcypher.com/btc-testnet/tx/' + txId + '/',
         [
-            new InsightExplorer( 'https://test-insight.bitpay.com' ),
-            new InsightExplorer( 'https://tbtc.blockdozer.com' ),
-            new InsightExplorer( 'https://testnet.blockexplorer.com' ),
-            new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' ),
-            new ChainSoExplorer( 'https://chain.so' )
+            new CoinMarketCapExplorer( 'https://pro-api.coinmarketcap.com' ),
+            new ChainSoExplorer( 'https://chain.so' ),
+            new BitcoinDotComPriceExplorer( 'https://coin-api.bitcoin.com' )
         ]
     );
 
@@ -50,15 +45,13 @@ export class BlockchainType {
         BitcoreCash,
         BitcoreCash.Networks.livenet,
         BitcoreCash.crypto.Signature.SIGHASH_ALL | BitcoreCash.crypto.Signature.SIGHASH_FORKID,
-        ( txId ) => 'https://bch.blockdozer.com/tx/' + txId,
+        ( txId ) => 'https://blockchair.com/bitcoin-cash/transaction/' + txId,
         [
-            new InsightExplorer( 'https://bch-insight.bitpay.com' ),            // good (except it accepts invalid txs)
             new InsightExplorer( 'https://bch.blockdozer.com' ),                // good (except I can't use it to broadcast txs)
-            //new InsightExplorer( 'https://bitcoincash.blockexplorer.com', false, false ),     // bad (ECONNREFUSED)
-            new InsightExplorer( 'https://cashexplorer.bitcoin.com', true, false ),    // good (except it accepts invalid txs)
             new BTCDotComExplorer( 'https://bch-chain.api.btc.com' ),
-            new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' ),
-            new BitcoinDotComExplorer( 'https://rest.bitcoin.com' )
+            new CoinMarketCapExplorer( 'https://pro-api.coinmarketcap.com' ),
+            new BitcoinDotComExplorer( 'https://rest.bitcoin.com' ),
+            new BitcoinDotComPriceExplorer( 'https://coin-api.bitcoin.com' )
         ]
     );
 
@@ -73,9 +66,9 @@ export class BlockchainType {
         [
             new InsightExplorer( 'https://test-bch-insight.bitpay.com', false, false ),
             new InsightExplorer( 'https://tbch.blockdozer.com' ),
-            // There's probably a test-bch blockexplorer site, but I couldn't find it...
-            new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' ),
-            new BitcoinDotComExplorer( 'https://trest.bitcoin.com' )
+            new CoinMarketCapExplorer( 'https://pro-api.coinmarketcap.com' ),
+            new BitcoinDotComExplorer( 'https://trest.bitcoin.com' ),
+            new BitcoinDotComPriceExplorer( 'https://coin-api.bitcoin.com' )
         ]
     );
 
