@@ -10,6 +10,8 @@ import { QrScannerComponent } from '../qr-scanner/qr-scanner.component';
 import { SmoothScroll } from '../../services/smooth-scroll/smooth-scroll.service';
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
+import { FeeRates } from '../../models/api-responses';
+import { NumberInputDialog } from '../../dialogs/number-input-dialog/number-input-dialog.component';
 
 @Component({
     selector: 'app-redeem',
@@ -114,7 +116,7 @@ export class RedeemComponent implements OnInit {
 
         return new Promise( (resolve, reject) => {
             if ( utxos.length === 0 ) {
-                return reject( new AppError(AppError.TYPES.NO_BALANCE, 'Error redeeming coins: the time-locked address has no coins to spend.') );
+                // return reject( new AppError(AppError.TYPES.NO_BALANCE, 'Error redeeming coins: the time-locked address has no coins to spend.') );
             }
 
             // Verify that the toAddress is valid
@@ -123,7 +125,23 @@ export class RedeemComponent implements OnInit {
                 return reject( new AppError(AppError.TYPES.OTHER, 'The destination address is invalid. (' + addressError.message + ')') );
             }
 
-            this.blockchainService.getFeeRates().then( rates => {
+            return this.blockchainService.getFeeRates().catch( e => {
+                // if fees could not be obtained, open a dialog to ask the user to define a fee.
+                return new Promise( (resolve, reject) => {
+                    let dialogRef = this.dialog.open( NumberInputDialog, {data: {
+                        message: 'Unable to find appropriate network fee rates. Please enter a fee amount.',
+                        inputLabel: 'Fee in satoshis/byte'
+                    }});
+                    dialogRef.afterClosed().subscribe( result => {
+                        if ( result ) {
+                            let val = parseInt( result );
+                            resolve({ high: val, medium: val, low: val });
+                        } else {
+                            reject( new AppError(AppError.TYPES.OTHER, 'Unable to redeem the locked coins unless a fee is defined.') );
+                        }
+                    });
+                });
+            }).then( (rates: FeeRates) => {
                 try {
                     // Extract the time lock expiry from the script
                     var timeLockBuf = redeemScript.chunks[0].buf;
@@ -169,8 +187,7 @@ export class RedeemComponent implements OnInit {
                 } catch( e ) {
                     reject( new AppError(AppError.TYPES.OTHER, 'Unexpected error building a transaction: ' + e.message) );
                 }
-            })
-            .catch( err => reject(err) );
+            });
         });
     }
 

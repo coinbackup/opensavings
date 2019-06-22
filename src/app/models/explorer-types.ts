@@ -19,6 +19,7 @@ export interface IExplorer {
     url: string;
     fork: string;
     bitcoreLib: Bitcore|BitcoreCash;
+    networkType: Bitcore.Network|BitcoreCash.Network;
     
     canGetUSDRate: boolean;
     canGetUTXOs: boolean;
@@ -30,6 +31,7 @@ export interface IExplorer {
 export abstract class Explorer {
     public fork: string;
     public bitcoreLib: Bitcore|BitcoreCash;
+    public networkType: Bitcore.Network|BitcoreCash.Network;
     
     // Not all APIs have all features. Provide a way to keep track of how we can use each kind of API.
     constructor(
@@ -158,5 +160,74 @@ export class CoinMarketCapExplorer extends Explorer implements IExplorer {
         let coinID: number = this.fork === BlockchainForks.BTC ? 1 : 1831;
         return NetworkService.instance.fetchJSON( this.url + '/v2/ticker/' + coinID + '/' )
         .then( response => response.data.quotes.USD.price );
+    }
+}
+
+
+// this explorer only works with BTC mainnet or testnet
+export class ChainSoExplorer extends Explorer implements IExplorer {
+    constructor( public url: string ) {
+        super( url, true, true, false, true );
+    }
+
+    private getNetworkSymbol(): string {
+        let symbol = this.networkType === Bitcore.Networks.livenet ? 'BTC' :
+            this.networkType === Bitcore.Networks.testnet ? 'BTCTEST' :
+            undefined;
+        if ( symbol === undefined ) {
+            throw 'Using unsupported network for ChainSo explorer';
+        }
+        return symbol;
+    }
+
+    public getUSDRate(): Promise<number> {
+        // the api call to get BTCTEST price does not return anything useful. Use BTC always
+        return NetworkService.instance.fetchJSON( this.url + `/api/v2/get_price/BTC/USD` )
+        .then( response => parseFloat(response.data.prices[0].price) );
+    }
+
+    public getUTXOs( address: string ): Promise<UTXO[]> {
+        let networkSymbol = this.getNetworkSymbol();
+        return NetworkService.instance.fetchJSON( this.url + `/api/v2/get_tx_unspent/${networkSymbol}/${address}` )
+        .then( response => {
+            // Convert the response to a bitcore-friendly format
+            return response.data.txs.map( utxo => {
+                let btcValue = parseFloat( utxo.value );
+                return {
+                    amount: parseFloat( utxo.value ),
+                    satoshis: this.bitcoreLib.Unit.fromBTC( btcValue ).toSatoshis,
+                    txid: utxo.txid,
+                    confirmations: utxo.confirmations,
+                    vout: utxo.output_no
+                };
+            });
+        });
+    }
+
+    public broadcastTx( serializedTx: string ): Promise<string> {
+        let networkSymbol = this.getNetworkSymbol();
+        return NetworkService.instance.postJSON( this.url + `/api/v2/send_tx/${networkSymbol}`, { tx_hex: serializedTx } )
+        .then( response => response.txid || response.data.txid );
+    }
+}
+
+
+// this explorer only works with BCH mainnet or testnet
+export class BitcoinDotComExplorer extends Explorer implements IExplorer {
+    constructor( public url: string ) {
+        super( url, false, true, false, true );
+    }
+
+    public getUTXOs( address: string ): Promise<UTXO[]> {
+        return NetworkService.instance.fetchJSON( this.url + `/v2/address/utxo/${address}` )
+        .then( response => {
+            // No need to convert; the format returned is exactly as bitcore expects
+            return response.utxos;
+        });
+    }
+
+    public broadcastTx( serializedTx: string ): Promise<string> {
+        return NetworkService.instance.postJSON( this.url + `/v2/rawtransactions/sendRawTransaction`, {hexes: [serializedTx]} )
+        .then( response => response[0] );
     }
 }

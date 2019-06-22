@@ -1,4 +1,4 @@
-import { IExplorer, InsightExplorer, BTCDotComExplorer, CoinMarketCapExplorer } from './explorer-types';
+import { IExplorer, InsightExplorer, BTCDotComExplorer, CoinMarketCapExplorer, ChainSoExplorer, BitcoinDotComExplorer } from './explorer-types';
 import { BlockchainForks } from './blockchain-forks';
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
@@ -21,7 +21,8 @@ export class BlockchainType {
             new InsightExplorer( 'https://insight.bitcoin.com' ),
             new InsightExplorer( 'https://www.localbitcoinschain.com' ),
             new BTCDotComExplorer( 'https://chain.api.btc.com' ),
-            new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' )
+            new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' ),
+            new ChainSoExplorer( 'https://chain.so' )
         ]
     );
 
@@ -37,7 +38,8 @@ export class BlockchainType {
             new InsightExplorer( 'https://test-insight.bitpay.com' ),
             new InsightExplorer( 'https://tbtc.blockdozer.com' ),
             new InsightExplorer( 'https://testnet.blockexplorer.com' ),
-            new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' )
+            new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' ),
+            new ChainSoExplorer( 'https://chain.so' )
         ]
     );
 
@@ -56,6 +58,7 @@ export class BlockchainType {
             new InsightExplorer( 'https://cashexplorer.bitcoin.com', true, false ),    // good (except it accepts invalid txs)
             new BTCDotComExplorer( 'https://bch-chain.api.btc.com' ),
             new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' ),
+            new BitcoinDotComExplorer( 'https://rest.bitcoin.com' )
         ]
     );
 
@@ -71,7 +74,8 @@ export class BlockchainType {
             new InsightExplorer( 'https://test-bch-insight.bitpay.com', false, false ),
             new InsightExplorer( 'https://tbch.blockdozer.com' ),
             // There's probably a test-bch blockexplorer site, but I couldn't find it...
-            new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' )
+            new CoinMarketCapExplorer( 'https://api.coinmarketcap.com' ),
+            new BitcoinDotComExplorer( 'https://trest.bitcoin.com' )
         ]
     );
 
@@ -97,6 +101,7 @@ export class BlockchainType {
         this.explorers.forEach( explorer => {
             explorer.bitcoreLib = this.bitcoreLib;
             explorer.fork = this.fork;
+            explorer.networkType = this.networkType;
         });
     }
     

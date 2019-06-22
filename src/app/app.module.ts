@@ -39,6 +39,7 @@ import { QrScannerComponent } from './components/qr-scanner/qr-scanner.component
 import { BasicDialog } from './dialogs/basic-dialog/basic-dialog.component';
 import { ImageDialog } from './dialogs/image-dialog/image-dialog.component';
 import { ConfirmDialog } from './dialogs/confirm-dialog/confirm-dialog.component';
+import { NumberInputDialog } from './dialogs/number-input-dialog/number-input-dialog.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -51,7 +52,7 @@ export function HttpLoaderFactory(http: HttpClient) {
         HomeComponent,
         WebviewDirective,
         // Dialogs
-        BasicDialog, ImageDialog, ConfirmDialog,
+        BasicDialog, ImageDialog, ConfirmDialog, NumberInputDialog,
         DownloadComponent,
         CreateComponent,
         CheckBalanceComponent,
@@ -61,7 +62,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     entryComponents: [
         BasicDialog,
         ImageDialog,
-        ConfirmDialog
+        ConfirmDialog,
+        NumberInputDialog
     ],
     imports: [
         BrowserModule,

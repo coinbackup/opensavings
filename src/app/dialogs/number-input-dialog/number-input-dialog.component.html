@@ -1,0 +1,11 @@
+<div mat-dialog-content>
+    <p>{{data.message}}</p>
+    <mat-form-field class="whole" appearance="fill">
+        <mat-label>{{data.inputLabel}}</mat-label>
+        <input matInput name="num-input" [(ngModel)]="inputValue" type="number" min="1">
+    </mat-form-field>
+</div>
+<div mat-dialog-actions>
+    <button mat-button color="primary" [mat-dialog-close]="false">Cancel</button>
+    <button mat-button color="primary" [mat-dialog-close]="inputValue">OK</button>
+</div>
