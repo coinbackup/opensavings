@@ -3,7 +3,7 @@
     {{data.title}}
 </h1>
 <div mat-dialog-content>
-    {{data.body}}
+    <div [innerHTML]="data.body"></div>
 </div>
 <div mat-dialog-actions>
     <button mat-button color="accent" mat-dialog-close cdkFocusInitial>Close</button>

@@ -72,7 +72,8 @@ h2, h3, h4, h5 {
     color: $color_primary;
 }
 
-mat-sidenav-content {
+mat-sidenav-content,
+.mat-dialog-content {
     a, a:link, a:visited { color: $color_primary }
     a:hover { color: white }
     a:active { color: $color_primary }
