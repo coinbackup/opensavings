@@ -9,10 +9,17 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 })
 export class NumberInputDialog {
 
-    inputValue = 1;
+    inputValue;
     
     constructor(
         public dialogRef: MatDialogRef<NumberInputDialog>,
-        @Inject(MAT_DIALOG_DATA) public data: {message: string, inputLabel: string} ) {}
+        @Inject(MAT_DIALOG_DATA) public data: {
+            message: string,
+            inputLabel: string,
+            defaultValue: number
+        }
+    ) {
+        this.inputValue = data.defaultValue || 1;
+    }
     
 }

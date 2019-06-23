@@ -45,10 +45,12 @@ export class RedeemComponent implements OnInit {
             
             this.redeemToAddress( data.version, data.blockchain, data.redeemScript, data.redeemKey, toAddress )
             .then( newTxId => {
-                this.newTxId = newTxId;
-                setTimeout( () => {
-                    this.smoothScroll.to( document.getElementById('success') );
-                }, 100 );
+                if ( newTxId ) { // newTxId will not be set if 'cancel' was clicked on the confirm dialog
+                    this.newTxId = newTxId;
+                    setTimeout( () => {
+                        this.smoothScroll.to( document.getElementById('success') );
+                    }, 100 );
+                }
             })
             .catch( err => this.showErrorModal(err) )
             ['finally']( () => this.buttonDisabled = false );
@@ -79,115 +81,137 @@ export class RedeemComponent implements OnInit {
             let privateKey = new bitcoreLib.PrivateKey( redeemerPrivateKeyWIF );
             
             return this.blockchainService.getUTXOs( p2shAddress )
-            .then( (utxos:any[]) => this.buildRedeemTx(redeemScript, privateKey, toAddress, utxos) )
-            .then( txDetails => {
-                return new Promise( (resolve,reject) => {
-                    this.blockchainService.getUSDRate().then( (USDPerCoin: number) => {
-                        txDetails.units = chain.shortName;
-                        txDetails.USDPerCoin = USDPerCoin;
-                        let dialogRef = this.dialog.open( ConfirmDialog, { data: txDetails } );
-                        dialogRef.afterClosed().subscribe( result => {
-                            if ( result ) {
-                                // confirmed.
-                                this.blockchainService.broadcastTx( txDetails.serializedTx )
-                                .then( newTxId => resolve(newTxId) )
-                                .catch( e => reject( e ) );
-                            } else {
-                                // cancelled.
-                                resolve();
-                            }
-                        });
-                    }).catch( e => reject(e) );
-                });
-            });
+            .then( (utxos:any[]) => this.buildRedeemTxWrapper(chain, redeemScript, privateKey, toAddress, utxos) );
         } catch( e ) {
             throw e;
         }
+    }
+
+    private buildRedeemTxWrapper(
+        chain: BlockchainType,
+        redeemScript: Bitcore.Script|BitcoreCash.Script,
+        redeemerPrivateKey: Bitcore.PrivateKey|BitcoreCash.PrivateKey,
+        toAddress: string,
+        utxos: any[],
+        fee?: number
+    ) {
+        return this.buildRedeemTx( redeemScript, redeemerPrivateKey, toAddress, utxos, fee )
+        .then( txDetails => {
+            return this.blockchainService.getUSDRate()
+            .then( (USDPerCoin: number) => {
+                txDetails.units = chain.shortName;
+                txDetails.USDPerCoin = USDPerCoin;
+                let dialogRef = this.dialog.open( ConfirmDialog, { data: txDetails } );
+                return dialogRef.afterClosed().toPromise()
+                .then( result => {
+                    if ( result ) {
+                        if ( result === 'custom-fee' ) {
+                            // show a dialog to enter a custom fee and rebuild and re-confirm the transaction
+                            let dialogRef = this.dialog.open( NumberInputDialog, {data: {
+                                message: 'Enter a custom fee',
+                                inputLabel: 'Fee in satoshis/byte',
+                                defaultValue: txDetails.feePerByte
+                            }});
+                            return dialogRef.afterClosed().toPromise()
+                            .then( result => {
+                                // use either the newly defined fee rate or the fee rate from the previously built transaction
+                                let customFee = result ? parseInt(result) : txDetails.feePerByte;
+                                return this.buildRedeemTxWrapper( chain, redeemScript, redeemerPrivateKey, toAddress, utxos, customFee );
+                            });
+                        } else {
+                            // confirmed.
+                            return this.blockchainService.broadcastTx( txDetails.serializedTx );
+                        }
+                    }
+                    // (otherwise, resolve with nothing, which indicates that 'cancel' was clicked)
+                });
+            });
+        });
     }
 
     private buildRedeemTx(
         redeemScript: Bitcore.Script|BitcoreCash.Script,
         redeemerPrivateKey: Bitcore.PrivateKey|BitcoreCash.PrivateKey,
         toAddress: string,
-        utxos: any[]
+        utxos: any[],
+        fee?: number
     ): any {
 
         let bitcoreLib = this.selectedBlockchain.bitcoreLib;
 
-        return new Promise( (resolve, reject) => {
-            if ( utxos.length === 0 ) {
-                // return reject( new AppError(AppError.TYPES.NO_BALANCE, 'Error redeeming coins: the time-locked address has no coins to spend.') );
-            }
+        if ( utxos.length === 0 ) {
+            return Promise.reject( new AppError(AppError.TYPES.NO_BALANCE, 'Error redeeming coins: the time-locked address has no coins to spend.') );
+        }
 
-            // Verify that the toAddress is valid
-            let addressError = bitcoreLib.Address.getValidationError( toAddress, bitcoreLib.Networks.defaultNetwork );
-            if ( addressError ) {
-                return reject( new AppError(AppError.TYPES.OTHER, 'The destination address is invalid. (' + addressError.message + ')') );
-            }
+        // Verify that the toAddress is valid
+        let addressError = bitcoreLib.Address.getValidationError( toAddress, bitcoreLib.Networks.defaultNetwork );
+        if ( addressError ) {
+            return Promise.reject( new AppError(AppError.TYPES.OTHER, 'The destination address is invalid. (' + addressError.message + ')') );
+        }
 
-            return this.blockchainService.getFeeRates().catch( e => {
-                // if fees could not be obtained, open a dialog to ask the user to define a fee.
-                return new Promise( (resolve, reject) => {
-                    let dialogRef = this.dialog.open( NumberInputDialog, {data: {
-                        message: 'Unable to find appropriate network fee rates. Please enter a fee amount.',
-                        inputLabel: 'Fee in satoshis/byte'
-                    }});
-                    dialogRef.afterClosed().subscribe( result => {
-                        if ( result ) {
-                            let val = parseInt( result );
-                            resolve({ high: val, medium: val, low: val });
-                        } else {
-                            reject( new AppError(AppError.TYPES.OTHER, 'Unable to redeem the locked coins unless a fee is defined.') );
-                        }
-                    });
-                });
-            }).then( (rates: FeeRates) => {
-                try {
-                    // Extract the time lock expiry from the script
-                    var timeLockBuf = redeemScript.chunks[0].buf;
-                    var lockTimeSeconds = bitcoreLib.crypto.BN.fromBuffer( timeLockBuf, {endian: 'little'} ).toNumber();
-                    if ( new Date(lockTimeSeconds*1000) > new Date() ) {
-                        reject( new AppError(AppError.TYPES.OTHER, 'Cannot redeem coins: the time lock has not yet expired.') );
-                    }
-
-                    // Find the total amount avaialble to spend
-                    let totalSatoshis = utxos.reduce( (total, utxo) => total + utxo.satoshis, 0 );
-            
-                    // Calculate a fee in Satoshis
-                    let txSizeBytes = this.timeLockService.getEstimatedTxSize( utxos.length );
-                    let feePerByte = rates.high; // @@ use a high fee for now
-                    let fee = Math.round( feePerByte * txSizeBytes );
-            
-                    // Build the transaction to redeem the coins
-                    let tx = new bitcoreLib.Transaction()
-                    .from( utxos )
-                    .to( toAddress, totalSatoshis - fee )
-                    // Must include nLockTime in order to spend CLTV-locked coins. Add one second to the lockTime for good measure
-                    .lockUntilDate( new Date((lockTimeSeconds+1) * 1000) );
-                    
-                    // If sequenceNumber is the default value, nLockTime will be ignored and the CLTV opcode will cause the tx to fail
-                    tx.inputs.forEach( input => input.sequenceNumber = 0 );
-
-                    // Now that the transaction is completely built except for signatures, sign the inputs and replace the
-                    // scriptSig on the inputs with new ones that will be able to spend the coins.
-                    tx.inputs.forEach( (input, i) => input.setScript(this.timeLockService.buildScriptSig( tx, i, redeemerPrivateKey, redeemScript )) );
-
-                    // We can't verify this tx, because bitcore can't auto-verify nonstandard txs.
-                    // Pass true to serialize() to skip all verification tests.
-                    let serializedTx = tx.serialize( true );
-                    console.log( 'Serialized transaction: ' + serializedTx );
-
-                    // resolve with all the details of the transaction
-                    resolve({
-                        toAddress: toAddress,
-                        total: bitcoreLib.Unit.fromSatoshis( totalSatoshis - fee ).toBTC(),
-                        fee: bitcoreLib.Unit.fromSatoshis( fee ).toBTC(),
-                        serializedTx: serializedTx
-                    });
-                } catch( e ) {
-                    reject( new AppError(AppError.TYPES.OTHER, 'Unexpected error building a transaction: ' + e.message) );
+        // either use the manually entered fee, or try to automatically determine a fee
+        return ( fee ? Promise.resolve({high:fee, medium:fee, low:fee}) : this.blockchainService.getFeeRates() )
+        .catch( e => {
+            // if fees could not be obtained, open a dialog to ask the user to define a fee.
+            let dialogRef = this.dialog.open( NumberInputDialog, {data: {
+                message: 'Unable to automatically find network fee rates. Please enter a fee amount.',
+                inputLabel: 'Fee in satoshis/byte'
+            }});
+            return dialogRef.afterClosed().toPromise().then( result => {
+                if ( result ) {
+                    let val = parseInt( result );
+                    return { high: val, medium: val, low: val };
+                } else {
+                    throw( new AppError(AppError.TYPES.OTHER, 'Unable to redeem the locked coins unless a fee is defined.') );
                 }
             });
+        }).then( (rates: FeeRates) => {
+            try {
+                // Extract the time lock expiry from the script
+                var timeLockBuf = redeemScript.chunks[0].buf;
+                var lockTimeSeconds = bitcoreLib.crypto.BN.fromBuffer( timeLockBuf, {endian: 'little'} ).toNumber();
+                if ( new Date(lockTimeSeconds*1000) > new Date() ) {
+                    throw( new AppError(AppError.TYPES.OTHER, 'Cannot redeem coins: the time lock has not yet expired.') );
+                }
+
+                // Find the total amount avaialble to spend
+                let totalSatoshis = utxos.reduce( (total, utxo) => total + utxo.satoshis, 0 );
+        
+                // Calculate a fee in Satoshis
+                let txSizeBytes = this.timeLockService.getEstimatedTxSize( utxos.length );
+                let feePerByte = rates.high; // @@ use a high fee for now
+                let fee = Math.round( feePerByte * txSizeBytes );
+        
+                // Build the transaction to redeem the coins
+                let tx = new bitcoreLib.Transaction()
+                .from( utxos )
+                .to( toAddress, totalSatoshis - fee )
+                // Must include nLockTime in order to spend CLTV-locked coins. Add one second to the lockTime for good measure
+                .lockUntilDate( new Date((lockTimeSeconds+1) * 1000) );
+                
+                // If sequenceNumber is the default value, nLockTime will be ignored and the CLTV opcode will cause the tx to fail
+                tx.inputs.forEach( input => input.sequenceNumber = 0 );
+
+                // Now that the transaction is completely built except for signatures, sign the inputs and replace the
+                // scriptSig on the inputs with new ones that will be able to spend the coins.
+                tx.inputs.forEach( (input, i) => input.setScript(this.timeLockService.buildScriptSig( tx, i, redeemerPrivateKey, redeemScript )) );
+
+                // We can't verify this tx, because bitcore can't auto-verify nonstandard txs.
+                // Pass true to serialize() to skip all verification tests.
+                let serializedTx = tx.serialize( true );
+                console.log( 'Serialized transaction: ' + serializedTx );
+
+                // resolve with all the details of the transaction
+                return{
+                    toAddress: toAddress,
+                    total: bitcoreLib.Unit.fromSatoshis( totalSatoshis - fee ).toBTC(),
+                    fee: bitcoreLib.Unit.fromSatoshis( fee ).toBTC(),
+                    serializedTx: serializedTx,
+                    feePerByte: feePerByte
+                };
+            } catch( e ) {
+                throw( new AppError(AppError.TYPES.OTHER, 'Unexpected error building a transaction: ' + e.message) );
+            }
         });
     }
 

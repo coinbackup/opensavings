@@ -5,6 +5,7 @@
         <dd><code>{{txDetails.total}} {{txDetails.units}} <span class="usd-amount">({{getUSDAmount(txDetails.total)}})</span></code></dd>
         <dt>Fee:</dt>
         <dd><code>{{txDetails.fee}} {{txDetails.units}} <span class="usd-amount">({{getUSDAmount(txDetails.fee)}})</span></code></dd>
+        <dd><button mat-button color="accent" [mat-dialog-close]="'custom-fee'">Enter a custom fee</button></dd>
         <dt>Redeem to:</dt>
         <dd><code>{{txDetails.toAddress}}</code></dd>
     </dl>
