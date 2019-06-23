@@ -151,33 +151,21 @@ export class BTCDotComExplorer extends Explorer implements IExplorer {
 }
 
 
-export class CoinMarketCapExplorer extends Explorer implements IExplorer {
+// only works with BTC
+export class BitcoinFeesExplorer extends Explorer implements IExplorer {
     constructor( public url: string ) {
-        super( url, true, false, false, false );
+        super( url, false, false, true, false );
     }
 
-    public getUSDRate(): Promise<number> {
-        let coinID: number = this.fork === BlockchainForks.BTC ? 1 : 1831;
-        return NetworkService.instance.fetchJSON( this.url + '/v1/cryptocurrency/quotes/latest?id=' + coinID +'&convert=USD', {
-            headers: {
-                'Accept': 'application/json',
-                'X-CMC_PRO_API_KEY': '2c319fda-9af9-4d80-82c0-4b41938b3dd4'
-            }
-        })
-        .then( response => response.data[ coinID.toString() ].quote.USD.price );
-    }
-}
-
-
-export class BitcoinDotComPriceExplorer extends Explorer implements IExplorer {
-    constructor( public url: string ) {
-        super( url, true, false, false, false );
-    }
-
-    public getUSDRate(): Promise<number> {
-        let ticker = this.fork === BlockchainForks.BTC ? 'BTC' : 'BCH';
-        return NetworkService.instance.fetchJSON( this.url + '/v1/bitcoins/' )
-        .then( response => response.data[ticker] );
+    public getFeeRates(): Promise<FeeRates> {
+        return NetworkService.instance.fetchJSON( this.url + '/api/v1/fees/recommended' )
+        .then( response => {
+            return {
+                low: response.hourFee,
+                medium: response.halfHourFee,
+                high: response.fastestFee
+            };
+        });
     }
 }
 

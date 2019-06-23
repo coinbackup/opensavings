@@ -1,4 +1,4 @@
-import { IExplorer, InsightExplorer, BTCDotComExplorer, CoinMarketCapExplorer, ChainSoExplorer, BitcoinDotComExplorer, BitcoinDotComPriceExplorer } from './explorer-types';
+import { IExplorer, InsightExplorer, BTCDotComExplorer, ChainSoExplorer, BitcoinDotComExplorer, BitcoinFeesExplorer } from './explorer-types';
 import { BlockchainForks } from './blockchain-forks';
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
@@ -17,9 +17,8 @@ export class BlockchainType {
         [
             new InsightExplorer( 'https://insight.bitpay.com' ),
             new BTCDotComExplorer( 'https://chain.api.btc.com' ),
-            new CoinMarketCapExplorer( 'https://pro-api.coinmarketcap.com' ),
-            new ChainSoExplorer( 'https://chain.so' ),
-            new BitcoinDotComPriceExplorer( 'https://coin-api.bitcoin.com' )
+            new BitcoinFeesExplorer( 'https://bitcoinfees.earn.com' ),
+            new ChainSoExplorer( 'https://chain.so' )
         ]
     );
 
@@ -32,9 +31,7 @@ export class BlockchainType {
         Bitcore.crypto.Signature.SIGHASH_ALL,
         ( txId ) => 'https://live.blockcypher.com/btc-testnet/tx/' + txId + '/',
         [
-            new CoinMarketCapExplorer( 'https://pro-api.coinmarketcap.com' ),
-            new ChainSoExplorer( 'https://chain.so' ),
-            new BitcoinDotComPriceExplorer( 'https://coin-api.bitcoin.com' )
+            new ChainSoExplorer( 'https://chain.so' )
         ]
     );
 
@@ -49,9 +46,7 @@ export class BlockchainType {
         [
             new InsightExplorer( 'https://bch.blockdozer.com' ),                // good (except I can't use it to broadcast txs)
             new BTCDotComExplorer( 'https://bch-chain.api.btc.com' ),
-            new CoinMarketCapExplorer( 'https://pro-api.coinmarketcap.com' ),
-            new BitcoinDotComExplorer( 'https://rest.bitcoin.com' ),
-            new BitcoinDotComPriceExplorer( 'https://coin-api.bitcoin.com' )
+            new BitcoinDotComExplorer( 'https://rest.bitcoin.com' )
         ]
     );
 
@@ -66,9 +61,7 @@ export class BlockchainType {
         [
             new InsightExplorer( 'https://test-bch-insight.bitpay.com', false, false ),
             new InsightExplorer( 'https://tbch.blockdozer.com' ),
-            new CoinMarketCapExplorer( 'https://pro-api.coinmarketcap.com' ),
-            new BitcoinDotComExplorer( 'https://trest.bitcoin.com' ),
-            new BitcoinDotComPriceExplorer( 'https://coin-api.bitcoin.com' )
+            new BitcoinDotComExplorer( 'https://trest.bitcoin.com' )
         ]
     );
 
