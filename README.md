@@ -14,7 +14,7 @@ The Open Savings Initiative app is built with Typescript, Anuglar, and Electron,
 
 ## Acknowledgements
 
-This app was developed by [Ransom Christofferson](http://ransomchristofferson.com/) and the [Prestige IT](https://prestigeit.io/) team with guidance from [Yeoman's Capital](https://www.yeomans.capital/), and was funded by a generous donation from [Ricardo Jimenezh](https://www.linkedin.com/in/ricardojimenezh/).
+This app was developed by [Ransom Christofferson](http://ransomchristofferson.com/) and the [Prestige IT](https://prestigeit.io/) team with guidance from [Yeoman's Capital](https://www.yeomans.capital/), and was funded by a generous donation from [Ricardo Jimenez](https://www.linkedin.com/in/ricardojimenezh/).
 
 Development was bootstrapped from [maximegris/angular-electron](https://github.com/maximegris/angular-electron).
 
