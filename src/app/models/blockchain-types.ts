@@ -29,8 +29,9 @@ export class BlockchainType {
         Bitcore,
         Bitcore.Networks.testnet,
         Bitcore.crypto.Signature.SIGHASH_ALL,
-        ( txId ) => 'https://live.blockcypher.com/btc-testnet/tx/' + txId + '/',
+        ( txId ) => 'https://tbtc.bitaps.com/' + txId,
         [
+            new InsightExplorer( 'https://test-insight.bitpay.com' ),
             new ChainSoExplorer( 'https://chain.so' )
         ]
     );
@@ -44,6 +45,7 @@ export class BlockchainType {
         BitcoreCash.crypto.Signature.SIGHASH_ALL | BitcoreCash.crypto.Signature.SIGHASH_FORKID,
         ( txId ) => 'https://blockchair.com/bitcoin-cash/transaction/' + txId,
         [
+            new InsightExplorer( 'https://bch-insight.bitpay.com/' ),
             new InsightExplorer( 'https://bch.blockdozer.com' ),                // good (except I can't use it to broadcast txs)
             new BTCDotComExplorer( 'https://bch-chain.api.btc.com' ),
             new BitcoinDotComExplorer( 'https://rest.bitcoin.com' )

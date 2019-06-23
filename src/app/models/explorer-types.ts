@@ -132,7 +132,7 @@ export class BTCDotComExplorer extends Explorer implements IExplorer {
             // Convert the response to a common format that bitcore will understand
             return response.data.list.map( utxo => {
                 return {
-                    amount: this.bitcoreLib.Unit.fromSatoshis( utxo.value ).toBTC,
+                    amount: this.bitcoreLib.Unit.fromSatoshis( utxo.value ).toBTC(),
                     satoshis: utxo.value,
                     txid: utxo.tx_hash,
                     confirmations: utxo.confirmations,
@@ -201,10 +201,11 @@ export class ChainSoExplorer extends Explorer implements IExplorer {
                 let btcValue = parseFloat( utxo.value );
                 return {
                     amount: parseFloat( utxo.value ),
-                    satoshis: this.bitcoreLib.Unit.fromBTC( btcValue ).toSatoshis,
+                    satoshis: this.bitcoreLib.Unit.fromBTC( btcValue ).toSatoshis(),
                     txid: utxo.txid,
                     confirmations: utxo.confirmations,
-                    vout: utxo.output_no
+                    vout: utxo.output_no,
+                    script: utxo.script_hex
                 };
             });
         });
