@@ -11,5 +11,5 @@ All notable changes to this project will be documented in this file.
 - Added version number check, to notify the user if an update is available
 - Removed changelog entries from the project this was forked from
 
-#### [1.0.0(https://github.com/coinbackup/opensavings/releases/tag/1.0.0)
+#### [1.0.0](https://github.com/coinbackup/opensavings/releases/tag/1.0.0)
 - Initial release.
