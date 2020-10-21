@@ -52,7 +52,22 @@ export class RedeemComponent implements OnInit {
                     }, 100 );
                 }
             })
-            .catch( err => this.showErrorModal(err) )
+            .catch( err => {
+                // if `serializedTx` is defined, then only the last step failed-
+                // instruct the user to broadcast the tx manually
+                if ( err.serializedTx ) {
+                    this.dialog.open( BasicDialog, { data: {
+                        title: 'Error',
+                        icon: './assets/img/icons/x.svg',
+                        body: `<p>Couldn't connect to APIs to broadcast the transaction. Copy the transaction code below and visit `
+                         + `<a href="${this.selectedBlockchain.broadcastFallbackUrl}" target="_blank">${this.selectedBlockchain.broadcastFallbackUrl}</a> `
+                         + `to broadcast your transaction and redeem your coins.</p>`,
+                        infoToCopy: err.serializedTx
+                    }});
+                } else {
+                    this.showErrorModal( err );
+                }
+            })
             ['finally']( () => this.buttonDisabled = false );
 
         } catch( e ) {
@@ -98,6 +113,7 @@ export class RedeemComponent implements OnInit {
         return this.buildRedeemTx( redeemScript, redeemerPrivateKey, toAddress, utxos, fee )
         .then( txDetails => {
             return this.blockchainService.getUSDRate()
+            .catch( err => null ) // if we couldn't get the rate, just don't show it in the UI
             .then( (USDPerCoin: number) => {
                 txDetails.units = chain.shortName;
                 txDetails.USDPerCoin = USDPerCoin;
@@ -120,7 +136,12 @@ export class RedeemComponent implements OnInit {
                             });
                         } else {
                             // confirmed.
-                            return this.blockchainService.broadcastTx( txDetails.serializedTx );
+                            return this.blockchainService.broadcastTx( txDetails.serializedTx )
+                            .catch( err => {
+                                // attach the serialized tx to the error and pass it upwards
+                                err.serializedTx = txDetails.serializedTx;
+                                throw err;
+                            });
                         }
                     }
                     // (otherwise, resolve with nothing, which indicates that 'cancel' was clicked)

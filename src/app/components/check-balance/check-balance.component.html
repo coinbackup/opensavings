@@ -34,6 +34,11 @@
     </h1>
     <div>
         <h3>Balance of address</h3>
-        <p><b>{{balanceInfo.totalCoinsText}}</b><br>({{balanceInfo.totalUSDText}})</p>
+        <p>
+            <b>{{balanceInfo.totalCoinsText}}</b>
+            <span *ngIf="balanceInfo.totalUSDText != null">
+                <br>({{balanceInfo.totalUSDText}})
+            </span>
+        </p>
     </div>
 </mat-card>

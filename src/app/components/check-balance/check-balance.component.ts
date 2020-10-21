@@ -51,18 +51,29 @@ export class CheckBalanceComponent implements OnInit {
             let bitcoreLib = this.blockchainService.getBlockchainType().bitcoreLib;
             let totalCoins = 0;
 
-            // Sum all UTXOs for the address
-            this.blockchainService.getUTXOs( p2shAddress )
-            .then( (utxos: any[]) => {
-                // Add the available satoshis from all UTXOs
-                let totalSatoshis = utxos.reduce( (total, utxo) => total + utxo.satoshis, 0 );
+            this.blockchainService.getBalance( p2shAddress )
+            .catch( err => {
+                // We couldn't directly get the number of satoshis for some reason. Try to get the
+                // balance by summing up UTXOs
+                return this.blockchainService.getUTXOs( p2shAddress )
+                .then( (utxos: any[]) => {
+                    // Add the available satoshis from all UTXOs
+                    return utxos.reduce( (total, utxo) => total + utxo.satoshis, 0 );
+                });
+            })
+            .then( totalSatoshis => {
                 totalCoins = bitcoreLib.Unit.fromSatoshis(totalSatoshis).toBTC();
                 this.balanceInfo.totalCoinsText = totalCoins + ' ' + this.blockchainService.getBlockchainType().shortName;
-                return this.blockchainService.getUSDRate()
+                // If we can't get the USD rate, don't sweat it. Set the resolved value to 'null' and the UI won't show USD.
+                return this.blockchainService.getUSDRate().catch( err => null );
             })
             .then( (USDPerCoin: number) => {
-                let usd = USDPerCoin * totalCoins;
-                this.balanceInfo.totalUSDText = usd < 0.01 ? 'less than $0.01 USD' : '$' + usd.toFixed(2) + ' USD';
+                if ( USDPerCoin != null ) {
+                    let usd = USDPerCoin * totalCoins;
+                    this.balanceInfo.totalUSDText = usd < 0.01 ? 'less than $0.01 USD' : '$' + usd.toFixed(2) + ' USD';
+                } else {
+                    this.balanceInfo.totalUSDText = null;
+                }
                 setTimeout( () => {
                     this.smoothScroll.to( document.getElementById('success') );
                 }, 100 );

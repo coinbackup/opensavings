@@ -14,6 +14,7 @@ export interface IExplorer {
     getUSDRate?(): Promise<number>;
     getUTXOs?( address: string ): Promise<UTXO[]>;
     getFeeRates?(): Promise<FeeRates>;
+    getBalance?( address: string ): Promise<number>; // number of satoshis
     broadcastTx?( serializedTx: string ): Promise<string>;
 
     url: string;
@@ -25,6 +26,7 @@ export interface IExplorer {
     canGetUTXOs: boolean;
     canGetFeeRates: boolean;
     canBroadcast: boolean;
+    canGetBalance: boolean;
 }
 
 
@@ -39,54 +41,55 @@ export abstract class Explorer {
         public canGetUSDRate: boolean,
         public canGetUTXOs: boolean,
         public canGetFeeRates: boolean,
-        public canBroadcast: boolean
+        public canBroadcast: boolean,
+        public canGetBalance: boolean
     ) {}
 }
 
+export class BitcoreExplorer extends Explorer implements IExplorer {
 
-export class InsightExplorer extends Explorer implements IExplorer {
-    
-    // Some BCH explorers only accept legacy address formats in API calls. We'll have to convert to legacy format for these.
-    // Some BCH instances of Insight return the BTC USD rate. Account for those as well.
-    constructor( public url: string, public convertCashAddrToLegacy: boolean = false, USDRateWorksProperly: boolean = true ) {
-        super( url, USDRateWorksProperly, true, true, true );
+    constructor( public url: string, getBalanceWorks: boolean = true, getUtxosWorks: boolean = true ) {
+        super( url, false, getUtxosWorks, true, true, getBalanceWorks );
     }
 
-    public getUSDRate(): Promise<number> {
-        // A response from the server might look like: {"status":200,"data":{"kraken":788.4}}
-        return NetworkService.instance.fetchJSON( this.url + '/api/currency' )
-        .then( response => response.data[ Object.keys(response.data)[0] ] );
+    // Get balance in satoshis, using only confirmed txs
+    public getBalance( address: string ): Promise<number> {
+        return NetworkService.instance.fetchJSON( this.url + '/address/' + address + '/balance' )
+        .then( response => response.confirmed );
     }
-    
+
     // Get unspent transaction outputs for an address.
     public getUTXOs( address: string ): Promise<UTXO[]> {
-        if ( this.convertCashAddrToLegacy ) {
-            address = CashAddr.toLegacyAddress( address );
-        }
-        return NetworkService.instance.fetchJSON( this.url + '/api/addr/' + address + '/utxo' )
-        .then( utxos => {
-            // For BCH, some servers don't return addresses in cashAddr format, and this breaks the code. The formatting needs to be fixed.
-            if ( this.fork === BlockchainForks.BCH ) {
-                utxos.forEach( utxo => utxo.address = CashAddr.toCashAddress(utxo.address) );
-            }
-            return utxos;
+        return NetworkService.instance.fetchJSON( this.url + '/address/' + address + '/?unspent=true' )
+        // convert the transactions into a format bitcore understands
+        .then( utxos => utxos.map( utxo => {
+            return {
+                amount: this.bitcoreLib.Unit.fromSatoshis( utxo.value ).toBTC(),
+                satoshis: utxo.value,
+                txid: utxo.mintTxid,
+                confirmations: utxo.confirmations,
+                vout: utxo.mintIndex,
+                script: utxo.script
+            };
+        })).then( r => {
+            console.log( r );
+            return r;
         });
     }
-
 
     // Find the estimated fees in satoshis/byte to get the transaction included in:
     // The next 2 blocks, the next 4 blocks, or the next 8 blocks
     public getFeeRates(): Promise<FeeRates> {
         // Get all three fee estmations from the same service.
         return Promise.all([
-            NetworkService.instance.fetchJSON( this.url + '/api/utils/estimatefee?nbBlocks=2' ),
-            NetworkService.instance.fetchJSON( this.url + '/api/utils/estimatefee?nbBlocks=4' ),
-            NetworkService.instance.fetchJSON( this.url + '/api/utils/estimatefee?nbBlocks=8' )
+            NetworkService.instance.fetchJSON( this.url + '/fee/2' ),
+            NetworkService.instance.fetchJSON( this.url + '/fee/4' ),
+            NetworkService.instance.fetchJSON( this.url + '/fee/8' )
         ])
         .then( fees => {
             // Convert the somewhat odd response format into an object with high/medium/low properties.
             // Also convert the returned BTC/kb units into satoshis/byte.
-            let convertedFees = [ this.btcPerKbToSatoshisPerByte( fees[0]['2'] ), this.btcPerKbToSatoshisPerByte( fees[1]['4'] ), this.btcPerKbToSatoshisPerByte( fees[2]['8'] ) ];
+            const convertedFees = fees.map( fee => this.btcPerKbToSatoshisPerByte(fee.feerate) );
             // Sometimes the values can be negative (not sure why???). Correct these.
             if ( convertedFees[1] <= 0 ) convertedFees[1] = convertedFees[2];
             if ( convertedFees[0] <= 0 ) convertedFees[0] = convertedFees[1];
@@ -97,13 +100,11 @@ export class InsightExplorer extends Explorer implements IExplorer {
         });
     }
 
-
     public broadcastTx( serializedTx: string ): Promise<string> {
-        return NetworkService.instance.postJSON( this.url + '/api/tx/send', { rawtx: serializedTx } )
-        // the format of the response can vary between different insight servers
+        return NetworkService.instance.postJSON( this.url + '/tx/send', { rawtx: serializedTx } )
+        // the format of the response can vary between different servers
         .then( response => response.txid.result || response.txid );
     }
-
 
     private btcPerKbToSatoshisPerByte( btcPerKb: number ): number {
         return this.bitcoreLib.Unit.fromBTC( btcPerKb ).toSatoshis() / 1000;
@@ -117,7 +118,7 @@ export class BTCDotComExplorer extends Explorer implements IExplorer {
     // total_count = number of entries, page = current page, pagesize = entries per page
     
     constructor( public url: string ) {
-        super( url, false, true, false, false );
+        super( url, false, true, false, false, false );
     }
 
     // Get unspent transaction outputs for an address.
@@ -130,6 +131,9 @@ export class BTCDotComExplorer extends Explorer implements IExplorer {
         .then( response => {
             this.checkForError( response );
             // Convert the response to a common format that bitcore will understand
+            if ( response.data.list == null ) {
+                response.data.list = [];
+            }
             return response.data.list.map( utxo => {
                 return {
                     amount: this.bitcoreLib.Unit.fromSatoshis( utxo.value ).toBTC(),
@@ -137,6 +141,7 @@ export class BTCDotComExplorer extends Explorer implements IExplorer {
                     txid: utxo.tx_hash,
                     confirmations: utxo.confirmations,
                     vout: utxo.tx_output_n
+                    // @@?? script???
                 };
             });
         });
@@ -154,7 +159,7 @@ export class BTCDotComExplorer extends Explorer implements IExplorer {
 // only works with BTC
 export class BitcoinFeesExplorer extends Explorer implements IExplorer {
     constructor( public url: string ) {
-        super( url, false, false, true, false );
+        super( url, false, false, true, false, false );
     }
 
     public getFeeRates(): Promise<FeeRates> {
@@ -173,7 +178,7 @@ export class BitcoinFeesExplorer extends Explorer implements IExplorer {
 // this explorer only works with BTC mainnet or testnet
 export class ChainSoExplorer extends Explorer implements IExplorer {
     constructor( public url: string ) {
-        super( url, true, true, false, true );
+        super( url, true, true, false, true, false );
     }
 
     private getNetworkSymbol(): string {
@@ -222,7 +227,7 @@ export class ChainSoExplorer extends Explorer implements IExplorer {
 // this explorer only works with BCH mainnet or testnet
 export class BitcoinDotComExplorer extends Explorer implements IExplorer {
     constructor( public url: string ) {
-        super( url, false, true, false, true );
+        super( url, false, true, false, true, false );
     }
 
     public getUTXOs( address: string ): Promise<UTXO[]> {

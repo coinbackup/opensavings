@@ -61,6 +61,21 @@ export class BlockchainService {
         );
     }
 
+    /**
+     * Checks the blockchain for the balance of given address.
+     * @param {string} address A pubKeyHash or scriptHash address.
+     * @returns {Promise<number>} A Promise which resolves with the number of satoshis available at the address, or rejects with an error.
+     */
+    public getBalance( address: string ): Promise<number> {
+        return this.queryAllAPIs(
+            'canGetBalance',
+            'getBalance',
+            [address],
+            'Error while getting balance',
+            'Unexpected error while attempting to get balance'
+        );
+    }
+
     // Returns a promise which resolves with an object containing { high, medium, low }, which are fees in satoshis/byte
     // for a transaction which would have high, medium, or low priority. Note that the values may not be integers.
     public getFeeRates(): Promise<FeeRates> {
@@ -92,6 +107,10 @@ export class BlockchainService {
         ).map(
             explorer => explorer[APIFunctionName]( ...APIFunctionArgs )
         );
+
+        if ( serviceRequests.length === 0 ) {
+            return Promise.reject( new Error('No explorers for this blockchain support the feature: ' + APIFeature) );
+        }
 
         return this._networkService.raceToSuccess( serviceRequests )
         .catch( err => {

@@ -1,4 +1,11 @@
-import { IExplorer, InsightExplorer, BTCDotComExplorer, ChainSoExplorer, BitcoinDotComExplorer, BitcoinFeesExplorer } from './explorer-types';
+import {
+    BitcoinDotComExplorer,
+    BitcoinFeesExplorer,
+    BitcoreExplorer,
+    BTCDotComExplorer,
+    ChainSoExplorer,
+    IExplorer
+} from './explorer-types';
 import { BlockchainForks } from './blockchain-forks';
 import * as Bitcore from 'bitcore-lib';
 import * as BitcoreCash from 'bitcore-lib-cash';
@@ -15,11 +22,12 @@ export class BlockchainType {
         Bitcore.crypto.Signature.SIGHASH_ALL,
         ( txId ) => 'https://blockchair.com/bitcoin/transaction/' + txId,
         [
-            new InsightExplorer( 'https://insight.bitpay.com' ),
+            new BitcoreExplorer( 'https://api.bitcore.io/api/BTC/mainnet' ),
             new BTCDotComExplorer( 'https://chain.api.btc.com' ),
             new BitcoinFeesExplorer( 'https://bitcoinfees.earn.com' ),
             new ChainSoExplorer( 'https://chain.so' )
-        ]
+        ],
+        'https://blockchair.com/broadcast#bitcoin'
     );
 
     public static readonly tBTC: BlockchainType = new BlockchainType(
@@ -31,9 +39,10 @@ export class BlockchainType {
         Bitcore.crypto.Signature.SIGHASH_ALL,
         ( txId ) => 'https://tbtc.bitaps.com/' + txId,
         [
-            new InsightExplorer( 'https://test-insight.bitpay.com' ),
+            new BitcoreExplorer( 'https://api.bitcore.io/api/BTC/testnet' ),
             new ChainSoExplorer( 'https://chain.so' )
-        ]
+        ],
+        'https://live.blockcypher.com/btc-testnet/pushtx/'
     );
 
     public static readonly BCH: BlockchainType = new BlockchainType(
@@ -45,11 +54,11 @@ export class BlockchainType {
         BitcoreCash.crypto.Signature.SIGHASH_ALL | BitcoreCash.crypto.Signature.SIGHASH_FORKID,
         ( txId ) => 'https://blockchair.com/bitcoin-cash/transaction/' + txId,
         [
-            new InsightExplorer( 'https://bch-insight.bitpay.com/' ),
-            new InsightExplorer( 'https://bch.blockdozer.com' ),                // good (except I can't use it to broadcast txs)
+            new BitcoreExplorer( 'https://api.bitcore.io/api/BCH/mainnet' ),
             new BTCDotComExplorer( 'https://bch-chain.api.btc.com' ),
             new BitcoinDotComExplorer( 'https://rest.bitcoin.com' )
-        ]
+        ],
+        'https://blockchair.com/broadcast#bitcoin-cash'
     );
 
     public static readonly tBCH: BlockchainType = new BlockchainType(
@@ -61,10 +70,10 @@ export class BlockchainType {
         BitcoreCash.crypto.Signature.SIGHASH_ALL | BitcoreCash.crypto.Signature.SIGHASH_FORKID,
         ( txId ) => 'https://tbch.blockdozer.com/tx/' + txId,
         [
-            new InsightExplorer( 'https://test-bch-insight.bitpay.com', false, false ),
-            new InsightExplorer( 'https://tbch.blockdozer.com' ),
+            new BitcoreExplorer( 'https://api.bitcore.io/api/BCH/testnet', false, false ),
             new BitcoinDotComExplorer( 'https://trest.bitcoin.com' )
-        ]
+        ],
+        'https://trest.bitcoin.com/#/rawtransactions/sendRawTransactionSingle'
     );
 
     public static readonly allTypes: BlockchainType[] = [
@@ -83,7 +92,9 @@ export class BlockchainType {
         public networkType: Bitcore.Network|BitcoreCash.Network,
         public sigType: any,
         public getTxExplorerLink: Function,
-        public explorers: IExplorer[]
+        public explorers: IExplorer[],
+        /** A URL for the user to visit and manually paste in a serialized transaction, in order to broadcast it */
+        public broadcastFallbackUrl: string
     ) {
         // Give a reference to some important things in each of the explorers
         this.explorers.forEach( explorer => {

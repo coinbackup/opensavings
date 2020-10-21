@@ -4,6 +4,16 @@
 </h1>
 <div mat-dialog-content>
     <div [innerHTML]="data.body"></div>
+
+    <div *ngIf="data.infoToCopy">
+        <mat-form-field appearance="fill" class="whole">
+            <mat-label>Send coins to this address to lock them</mat-label>
+            <input matInput readonly (click)="$event.target.select()" [value]="data.infoToCopy" id="infoToCopy">
+        </mat-form-field>
+        <div class="below-field-button">
+            <button mat-button color="primary" (click)="copyToClipboard()">Copy to clipboard</button>
+        </div>
+    </div>
 </div>
 <div mat-dialog-actions>
     <button mat-button color="accent" mat-dialog-close cdkFocusInitial>Close</button>

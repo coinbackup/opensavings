@@ -13,7 +13,12 @@ export class ConfirmDialog {
         @Inject(MAT_DIALOG_DATA) public txDetails: any ) {}
     
     getUSDAmount( coins:number ): string {
-        let usd = ( coins * this.txDetails.USDPerCoin );
-        return usd < 0.01 ? 'less than $0.01 USD' : '$' + usd.toFixed(2) + ' USD';
+        // if we don't have USDPerCoin data, sadly we must simply not show the USD value
+        if ( this.txDetails.USDPerCoin == null ) {
+            return '';
+        } else {
+            let usd = ( coins * this.txDetails.USDPerCoin );
+            return usd < 0.01 ? 'less than $0.01 USD' : '$' + usd.toFixed(2) + ' USD';
+        }
     }
 }
