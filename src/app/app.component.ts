@@ -71,7 +71,7 @@ export class AppComponent {
         // check for version update
         NetworkService.instance.fetchJSON( 'https://raw.githubusercontent.com/coinbackup/opensavings/master/package.json' )
         .then( response => {
-            if ( response.version && response.version !== '1.0.2' ) {
+            if ( response.version && response.version !== '1.0.3' ) {
                 this.dialog.open( BasicDialog, { data: {
                     title: 'Update available',
                     body: 'Download the new version of Open Savings at <a href="https://opensavings.network/#download" target="_blank">https://opensavings.network/</a>'
