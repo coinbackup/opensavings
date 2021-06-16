@@ -94,6 +94,8 @@ export class RedeemComponent implements OnInit {
             let redeemScript = bitcoreLib.Script( fromRedeemScript );
             let p2shAddress = bitcoreLib.Address.payingTo( redeemScript ).toString();
             let privateKey = new bitcoreLib.PrivateKey( redeemerPrivateKeyWIF );
+            // remove any prefix like 'bitcoincash:' from the wallet address
+            toAddress = toAddress.replace( /^.*:/, '' );
             
             return this.blockchainService.getUTXOs( p2shAddress )
             .then( (utxos:any[]) => this.buildRedeemTxWrapper(chain, redeemScript, privateKey, toAddress, utxos) );

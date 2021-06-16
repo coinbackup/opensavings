@@ -54,12 +54,20 @@ export class BitcoreExplorer extends Explorer implements IExplorer {
 
     // Get balance in satoshis, using only confirmed txs
     public getBalance( address: string ): Promise<number> {
+        // The BCH version only accepts addresses in cashaddr format
+        if ( this.fork === BlockchainForks.BCH ) {
+            address = CashAddr.toCashAddress( address ).replace( /^.*:/, '' );
+        }
         return NetworkService.instance.fetchJSON( this.url + '/address/' + address + '/balance' )
         .then( response => response.confirmed );
     }
 
     // Get unspent transaction outputs for an address.
     public getUTXOs( address: string ): Promise<UTXO[]> {
+        // The BCH version only accepts addresses in cashaddr format
+        if ( this.fork === BlockchainForks.BCH ) {
+            address = CashAddr.toCashAddress( address ).replace( /^.*:/, '' );
+        }
         return NetworkService.instance.fetchJSON( this.url + '/address/' + address + '/?unspent=true' )
         // convert the transactions into a format bitcore understands
         .then( utxos => utxos.map( utxo => {

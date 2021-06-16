@@ -31,6 +31,8 @@ export class CheckBalanceComponent implements OnInit {
 
     public checkBalance( p2shAddress: string ) {
         this.buttonDisabled = true;
+        // remove any prefix like 'bitcoincash:' from the address
+        p2shAddress = p2shAddress.replace( /^.*:/, '' );
         
         try {
             // Find the address' blockchain and network

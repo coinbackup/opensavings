@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 #### [1.0.3](https://github.com/coinbackup/opensavings/releases/tag/1.0.3)
-- Added new BCH API endpoint
+- Update bitcore API endpoint
 - Fixed bug with scanning QR code in the browser
 
 #### [1.0.2](https://github.com/coinbackup/opensavings/releases/tag/1.0.2)
