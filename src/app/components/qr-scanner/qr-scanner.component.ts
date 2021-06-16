@@ -269,7 +269,11 @@ export class QrScannerComponent implements OnInit {
         var URLobj = window.URL || window['webkitURL'];
         src = src || '';
         if ( URLobj ) {
-            video.src = src === '' ? src : URLobj.createObjectURL( src );
+            try {
+                video.src = src === '' ? src : URLobj.createObjectURL( src );
+            } catch ( e ) {
+                video.srcObject = src;
+            }
         } else if ( video.mozSrcObject !== undefined ) {
             video.mozSrcObject = src;
         } else {

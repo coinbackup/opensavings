@@ -56,7 +56,8 @@ export class BlockchainType {
         [
             new BitcoreExplorer( 'https://api.bitcore.io/api/BCH/mainnet' ),
             new BTCDotComExplorer( 'https://bch-chain.api.btc.com' ),
-            new BitcoinDotComExplorer( 'https://rest.bitcoin.com' )
+            new BitcoinDotComExplorer( 'https://rest.bitcoin.com' ),
+            new BitcoinDotComExplorer( 'https://rest.bch.actorforth.org' )
         ],
         'https://blockchair.com/broadcast#bitcoin-cash'
     );
