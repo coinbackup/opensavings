@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 
 #### [1.0.3](https://github.com/coinbackup/opensavings/releases/tag/1.0.3)
 - Update bitcore API endpoint
+- Added fullstack.cash/bitcoin.comV5 API endpoint
+- Removed broken API endpoints as well as those that caused a scriptPubKey error
 - Fixed bug with scanning QR code in the browser
 - Updated dependencies
 

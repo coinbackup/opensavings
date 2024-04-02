@@ -1,8 +1,8 @@
 import {
     BitcoinDotComExplorer,
+    BitcoinDotComExplorerV5,
     BitcoinFeesExplorer,
     BitcoreExplorer,
-    BTCDotComExplorer,
     ChainSoExplorer,
     IExplorer
 } from './explorer-types';
@@ -23,9 +23,9 @@ export class BlockchainType {
         ( txId ) => 'https://blockchair.com/bitcoin/transaction/' + txId,
         [
             new BitcoreExplorer( 'https://api.bitcore.io/api/BTC/mainnet' ),
-            new BTCDotComExplorer( 'https://chain.api.btc.com' ),
             new BitcoinFeesExplorer( 'https://bitcoinfees.earn.com' ),
-            new ChainSoExplorer( 'https://chain.so' )
+            new ChainSoExplorer( 'https://chain.so' ),
+            // https://mempool.space/docs/api/rest
         ],
         'https://blockchair.com/broadcast#bitcoin'
     );
@@ -40,7 +40,8 @@ export class BlockchainType {
         ( txId ) => 'https://tbtc.bitaps.com/' + txId,
         [
             new BitcoreExplorer( 'https://api.bitcore.io/api/BTC/testnet' ),
-            new ChainSoExplorer( 'https://chain.so' )
+            new ChainSoExplorer( 'https://chain.so' ),
+            // https://mempool.space/testnet/docs/api/rest
         ],
         'https://live.blockcypher.com/btc-testnet/pushtx/'
     );
@@ -55,9 +56,7 @@ export class BlockchainType {
         ( txId ) => 'https://blockchair.com/bitcoin-cash/transaction/' + txId,
         [
             new BitcoreExplorer( 'https://api.bitcore.io/api/BCH/mainnet' ),
-            new BTCDotComExplorer( 'https://bch-chain.api.btc.com' ),
-            new BitcoinDotComExplorer( 'https://rest.bitcoin.com' )
-            // new BitcoinDotComExplorer( 'https://rest.bch.actorforth.org' ) // this may be enabled someday but it doesn't get all UTXOs
+            new BitcoinDotComExplorerV5( 'https://api.fullstack.cash' )
         ],
         'https://blockchair.com/broadcast#bitcoin-cash'
     );
@@ -71,8 +70,7 @@ export class BlockchainType {
         BitcoreCash.crypto.Signature.SIGHASH_ALL | BitcoreCash.crypto.Signature.SIGHASH_FORKID,
         ( txId ) => 'https://tbch.blockdozer.com/tx/' + txId,
         [
-            new BitcoreExplorer( 'https://api.bitcore.io/api/BCH/testnet', false, false ),
-            new BitcoinDotComExplorer( 'https://trest.bitcoin.com' )
+            new BitcoreExplorer( 'https://api.bitcore.io/api/BCH/testnet', false, false )
         ],
         'https://trest.bitcoin.com/#/rawtransactions/sendRawTransactionSingle'
     );

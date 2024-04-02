@@ -120,50 +120,6 @@ export class BitcoreExplorer extends Explorer implements IExplorer {
 }
 
 
-export class BTCDotComExplorer extends Explorer implements IExplorer {
-
-    // @@ in responses, what should I do if response.data.total_count > response.data.pagesize?
-    // total_count = number of entries, page = current page, pagesize = entries per page
-    
-    constructor( public url: string ) {
-        super( url, false, true, false, false, false );
-    }
-
-    // Get unspent transaction outputs for an address.
-    public getUTXOs( address: string ): Promise<any> {
-        // The BCH version only accepts addresses in legacy format
-        if ( this.fork === BlockchainForks.BCH ) {
-            address = CashAddr.toLegacyAddress( address );
-        }
-        return NetworkService.instance.fetchJSON( this.url + '/v3/address/' + address + '/unspent' )
-        .then( response => {
-            this.checkForError( response );
-            // Convert the response to a common format that bitcore will understand
-            if ( response.data.list == null ) {
-                response.data.list = [];
-            }
-            return response.data.list.map( utxo => {
-                return {
-                    amount: this.bitcoreLib.Unit.fromSatoshis( utxo.value ).toBTC(),
-                    satoshis: utxo.value,
-                    txid: utxo.tx_hash,
-                    confirmations: utxo.confirmations,
-                    vout: utxo.tx_output_n
-                    // @@?? script???
-                };
-            });
-        });
-    }
-
-    // With this API, if the request was malformed, it returns 200 and gives an error message in the JSON response.
-    private checkForError( serverResponse ) {
-        if ( serverResponse.err_no !== 0 ) {
-            throw new AppError( AppError.TYPES.SERVER, serverResponse.err_msg );
-        }
-    }
-}
-
-
 // only works with BTC
 export class BitcoinFeesExplorer extends Explorer implements IExplorer {
     constructor( public url: string ) {
@@ -249,5 +205,26 @@ export class BitcoinDotComExplorer extends Explorer implements IExplorer {
     public broadcastTx( serializedTx: string ): Promise<string> {
         return NetworkService.instance.postJSON( this.url + `/v2/rawtransactions/sendRawTransaction`, {hexes: [serializedTx]} )
         .then( response => response[0] );
+    }
+}
+
+// this explorer only works with BCH mainnet or testnet
+export class BitcoinDotComExplorerV5 extends Explorer implements IExplorer {
+    constructor( public url: string ) {
+        super( url, true, false, false, true, true );
+    }
+
+    public getBalance( address: string ): Promise<number> {
+        address = CashAddr.toCashAddress( address );
+        return NetworkService.instance.fetchJSON( this.url + `/v5/electrumx/balance/${address}` ).then( r => r.balance.confirmed );
+    }
+
+    public getUSDRate(): Promise<number> {
+        return NetworkService.instance.fetchJSON( this.url + `/v5/price/usd` ).then( r => r.usd );
+    }
+
+    public broadcastTx( serializedTx: string ): Promise<string> {
+        return NetworkService.instance.postJSON( this.url + `/v5/electrumx/tx/broadcast`, {txHex: serializedTx} )
+        .then( response => response.txid );
     }
 }

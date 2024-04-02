@@ -58,6 +58,8 @@ The user is given this new private key, along with the redeem script. This is al
 
 # Developing
 
+Use Node 12 with this repo.
+
 Clone this repository locally and install dependencies with npm:
 
 ``` bash

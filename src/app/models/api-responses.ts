@@ -14,6 +14,8 @@ export class UTXO {
 
     // The index number of this output in the containing transaction (w.r.t. all outputs in the tx, zero-indexed)
     public vout: number;
+
+    public script: string;
 }
 
 // Current transaction fees in Satoshis/byte
